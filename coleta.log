@@ -1,0 +1,41 @@
+2026-06-03 15:46:23,376 === INICIO COLETA AUTOMATICA ===
+2026-06-03 15:46:23,376 --- HISTORICO MENSAL ---
+2026-06-03 15:46:23,377 Historico: aesperancapizzaria
+2026-06-03 15:46:23,417 Erro historico aesperancapizzaria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:46:23,417 Meses encontrados: 0
+2026-06-03 15:47:53,417 Historico: 1900pizzeria
+2026-06-03 15:47:53,443 Erro historico 1900pizzeria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:47:53,443 Meses encontrados: 0
+2026-06-03 15:49:23,443 Historico: pizzeria_cezanne
+2026-06-03 15:49:23,466 Erro historico pizzeria_cezanne: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:49:23,467 Meses encontrados: 0
+2026-06-03 15:50:53,467 Historico: salavip_pizzabar
+2026-06-03 15:50:53,485 Erro historico salavip_pizzabar: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:50:53,485 Meses encontrados: 0
+2026-06-03 15:52:23,485 Historico: fornoeoregano
+2026-06-03 15:52:23,571 Erro historico fornoeoregano: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:52:23,571 Meses encontrados: 0
+2026-06-03 15:53:53,572 Historico: babbogiovannioficial
+2026-06-03 15:53:53,597 Erro historico babbogiovannioficial: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 15:53:53,597 Meses encontrados: 0
+2026-06-03 15:55:23,597 Aguardando 10min antes de coletar curtidas...
+2026-06-03 16:05:23,598 --- CURTIDAS E POSTS ---
+2026-06-03 16:05:23,598 Curtidas: aesperancapizzaria
+2026-06-03 16:05:23,623 Erro posts24 aesperancapizzaria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:05:23,624 Posts: 0 | Curtidas: 0
+2026-06-03 16:06:54,062 Curtidas: 1900pizzeria
+2026-06-03 16:06:54,081 Erro posts24 1900pizzeria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:06:54,081 Posts: 0 | Curtidas: 0
+2026-06-03 16:08:24,124 Curtidas: pizzeria_cezanne
+2026-06-03 16:08:24,156 Erro posts24 pizzeria_cezanne: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:08:24,156 Posts: 0 | Curtidas: 0
+2026-06-03 16:09:54,197 Curtidas: salavip_pizzabar
+2026-06-03 16:09:54,218 Erro posts24 salavip_pizzabar: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:09:54,218 Posts: 0 | Curtidas: 0
+2026-06-03 16:11:24,266 Curtidas: fornoeoregano
+2026-06-03 16:11:24,288 Erro posts24 fornoeoregano: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:11:24,288 Posts: 0 | Curtidas: 0
+2026-06-03 16:12:54,328 Curtidas: babbogiovannioficial
+2026-06-03 16:12:54,366 Erro posts24 babbogiovannioficial: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-03 16:12:54,366 Posts: 0 | Curtidas: 0
+2026-06-03 16:14:24,404 === COLETA FINALIZADA ===

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A EsperancA - Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#2d6a2d;--verde-light:#3d8b3d;--verde-pale:#edf4ed;--vermelho:#c0392b;--vermelho-pale:#fdf0ef;--creme:#faf8f3;--bege:#f0ece0;--texto:#1a1a18;--texto-muted:#7a7a72;--borda:#e2ddd0;--branco:#ffffff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto);min-height:100vh}
+.header{background:var(--verde);padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.2)}
+.header-left{display:flex;align-items:center;gap:16px;padding:12px 0}
+.logo-container{width:64px;height:64px;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.3);flex-shrink:0;background:white;display:flex;align-items:center;justify-content:center}
+.logo-placeholder{width:100%;height:100%;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+.lp-pizzaria{font-size:7px;color:#333;letter-spacing:1px;text-transform:uppercase}
+.lp-nome{font-size:10px;font-family:"Playfair Display",serif;color:#1a1a18;font-weight:700;line-height:1;text-align:center}
+.lp-desde{font-size:6px;color:#555;letter-spacing:1px;margin-top:2px}
+.header-title h1{font-family:"Playfair Display",serif;font-size:20px;color:white;font-weight:700}
+.header-title p{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+.ultima-atualizacao{font-size:11px;color:rgba(255,255,255,0.6)}
+.refresh-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:7px 16px;border-radius:20px;font-size:12px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all 0.2s}
+.refresh-btn:hover{background:rgba(255,255,255,0.25)}
+.container{max-width:920px;margin:0 auto;padding:28px 16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat{background:var(--branco);border-radius:12px;padding:18px 16px;text-align:center;border:1px solid var(--borda);position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--verde)}
+.stat.urgente-stat::before{background:var(--vermelho)}
+.stat-label{font-size:11px;color:var(--texto-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.stat-value{font-size:32px;font-weight:500;font-family:"Playfair Display",serif}
+.stat-value.red{color:var(--vermelho)}
+.stat-value.green{color:var(--verde)}
+.filtros-wrapper{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;background:var(--bege);padding:4px;border-radius:10px;border:1px solid var(--borda)}
+.tab{padding:7px 18px;font-size:13px;border-radius:7px;cursor:pointer;border:none;background:transparent;font-family:"DM Sans",sans-serif;color:var(--texto-muted);transition:all 0.2s}
+.tab.active{background:var(--branco);color:var(--texto);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.filtro-data-wrapper{display:flex;align-items:center;gap:8px}
+.filtro-data-label{font-size:12px;color:var(--texto-muted)}
+.filtro-data{padding:6px 12px;font-size:12px;border-radius:8px;border:1px solid var(--borda);background:var(--branco);font-family:"DM Sans",sans-serif;color:var(--texto);cursor:pointer}
+.filtro-data:focus{outline:none;border-color:var(--verde)}
+.btn-limpar{font-size:11px;color:var(--vermelho);cursor:pointer;border:none;background:none;font-family:"DM Sans",sans-serif;padding:0}
+.contagem{font-size:12px;color:var(--texto-muted)}
+.opp{background:var(--branco);border-radius:12px;padding:16px 18px;margin-bottom:10px;border:1px solid var(--borda);transition:box-shadow 0.2s;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.opp:hover{box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.opp.urgente{border-left:3px solid var(--vermelho)}
+.opp.respondida{opacity:0.55}
+.opp-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.opp-user{font-size:13px;font-weight:500}
+.opp-meta{font-size:11px;color:var(--texto-muted)}
+.badge{font-size:10px;padding:3px 10px;border-radius:20px;margin-left:auto;font-weight:500;text-transform:uppercase;letter-spacing:0.4px}
+.badge-urgente{background:var(--vermelho-pale);color:var(--vermelho)}
+.badge-normal{background:#fef9ec;color:#8a6400}
+.badge-ok{background:var(--verde-pale);color:var(--verde)}
+.opp-text{font-size:13px;color:#555;font-style:italic;margin-bottom:10px;line-height:1.5;padding-left:10px;border-left:2px solid var(--bege)}
+.resp-box{background:var(--creme);border:1px solid var(--borda);border-radius:8px;padding:10px 14px;font-size:13px;color:#444;cursor:pointer;margin-bottom:10px;transition:all 0.2s;line-height:1.5}
+.resp-box:hover{background:var(--bege);border-color:#ccc}
+.resp-hint{font-size:11px;color:var(--texto-muted);margin-top:5px}
+.opp-actions{display:flex;align-items:center;gap:10px}
+.btn-link{font-size:12px;color:var(--verde);text-decoration:none;font-weight:500}
+.btn-marcar{font-size:12px;padding:5px 14px;border-radius:6px;border:1px solid var(--borda);background:var(--branco);cursor:pointer;margin-left:auto;font-family:"DM Sans",sans-serif;transition:all 0.2s;color:var(--texto)}
+.btn-marcar:hover{background:var(--verde-pale);border-color:var(--verde);color:var(--verde)}
+.empty{text-align:center;padding:60px;color:var(--texto-muted);font-size:14px}
+.empty-icon{font-size:40px;margin-bottom:12px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.header{padding:0 16px}.ultima-atualizacao{display:none}.filtros-wrapper{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="logo-container">
+      <div class="logo-placeholder">
+        <span class="lp-pizzaria">Pizzaria</span>
+        <span class="lp-nome">AEsperancA</span>
+        <span class="lp-desde">Desde 1957</span>
+      </div>
+    </div>
+    <div class="header-title">
+      <h1>Pizzaria A EsperancA</h1>
+      <p>Monitoramento de engajamento - Jardim da Saude, SP</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="ultima-atualizacao" id="ultima-att"></span>
+    <button class="refresh-btn" onclick="carregar()">Atualizar</button>
+  </div>
+</div>
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Oportunidades</div><div class="stat-value" id="s-total">-</div></div>
+    <div class="stat urgente-stat"><div class="stat-label">Urgentes</div><div class="stat-value red" id="s-urgentes">-</div></div>
+    <div class="stat"><div class="stat-label">Respondidas</div><div class="stat-value green" id="s-respondidas">-</div></div>
+    <div class="stat"><div class="stat-label">Taxa de Resposta</div><div class="stat-value" id="s-taxa">-</div></div>
+  </div>
+  <div class="filtros-wrapper">
+    <div class="tabs">
+      <button class="tab active" onclick="filtrar('todas')" id="t-todas">Todas</button>
+      <button class="tab" onclick="filtrar('urgentes')" id="t-urgentes">Urgentes</button>
+      <button class="tab" onclick="filtrar('pendentes')" id="t-pendentes">Pendentes</button>
+      <button class="tab" onclick="filtrar('respondidas')" id="t-respondidas">Respondidas</button>
+    </div>
+    <div class="filtro-data-wrapper">
+      <span class="filtro-data-label">Dia:</span>
+      <select class="filtro-data" id="filtro-data" onchange="carregar()">
+        <option value="">Todos os dias</option>
+      </select>
+      <button class="btn-limpar" onclick="limparData()">Limpar</button>
+    </div>
+    <span class="contagem" id="contagem"></span>
+  </div>
+  <div id="lista"></div>
+</div>
+<script>
+let filtroAtivo="todas";
+
+async function carregarDatas(){
+  const datas = await fetch("/api/datas").then(r=>r.json());
+  const sel = document.getElementById("filtro-data");
+  datas.forEach(d=>{
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    sel.appendChild(opt);
+  });
+}
+
+function limparData(){
+  document.getElementById("filtro-data").value="";
+  carregar();
+}
+
+function filtrar(f){
+  filtroAtivo=f;
+  ["todas","urgentes","pendentes","respondidas"].forEach(t=>document.getElementById("t-"+t).classList.remove("active"));
+  document.getElementById("t-"+f).classList.add("active");
+  carregar();
+}
+
+async function carregar(){
+  try{
+    const data = document.getElementById("filtro-data").value;
+    const params = "filtro="+filtroAtivo+(data?"&data="+encodeURIComponent(data):"");
+    const[ops,st]=await Promise.all([
+      fetch("/api/oportunidades?"+params).then(r=>r.json()),
+      fetch("/api/stats?"+(data?"data="+encodeURIComponent(data):"")).then(r=>r.json())
+    ]);
+    document.getElementById("s-total").textContent=st.total;
+    document.getElementById("s-urgentes").textContent=st.urgentes;
+    document.getElementById("s-respondidas").textContent=st.respondidas;
+    document.getElementById("s-taxa").textContent=st.taxa+"%";
+    const agora=new Date();
+    document.getElementById("ultima-att").textContent="Atualizado as "+agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("contagem").textContent=ops.length+" post(s)";
+    const lista=document.getElementById("lista");
+    if(!ops.length){lista.innerHTML='<div class="empty"><div class="empty-icon">pizza</div>Nenhuma oportunidade aqui ainda.</div>';return}
+    lista.innerHTML=ops.map(op=>`
+      <div class="opp ${op.urgente&&!op.respondida?"urgente":""} ${op.respondida?"respondida":""}" id="op-${op.id}">
+        <div class="opp-header">
+          <span class="opp-user">${op.usuario||"@usuario"}</span>
+          <span class="opp-meta">#${op.hashtag} . ${op.criado_em}</span>
+          <span class="badge ${op.respondida?"badge-ok":op.urgente?"badge-urgente":"badge-normal"}">${op.respondida?"respondida":op.urgente?"urgente":"oportunidade"}</span>
+        </div>
+        <p class="opp-text">"${op.texto.substring(0,220)}"</p>
+        <div class="resp-box" onclick="copiar(this,this.dataset.resp)" data-resp="${op.resposta.replace(/"/g,"&quot;")}">
+          <div class="resp-texto">${op.resposta}</div>
+          <div class="resp-hint">Clique para copiar</div>
+        </div>
+        <div class="opp-actions">
+          <a class="btn-link" href="${op.link}" target="_blank">Abrir no Instagram</a>
+          <button class="btn-marcar" onclick="responder('${op.id}',${op.respondida?0:1})">${op.respondida?"Desfazer":"Marcar respondida"}</button>
+        </div>
+      </div>`).join("");
+  }catch(e){console.error(e)}
+}
+
+function copiar(el,texto){
+  navigator.clipboard.writeText(texto);
+  const h=el.querySelector(".resp-hint");
+  h.textContent="Copiado!";
+  setTimeout(()=>h.textContent="Clique para copiar",2000);
+}
+
+async function responder(id,valor){
+  await fetch("/api/responder/"+id,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valor})});
+  carregar();
+}
+
+carregarDatas();
+carregar();
+setInterval(carregar,60000);
+</script>
+</body>
+</html>

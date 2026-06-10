@@ -1,0 +1,514 @@
+f = open("/home/tassi/esperanca_bot/templates/concorrentes.html", "w", encoding="utf-8")
+f.write("""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Inteligencia Competitiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--verde:#2d6a2d;--verde-pale:#edf4ed;--vermelho:#c0392b;--creme:#faf8f3;--bege:#f0ece0;--texto:#1a1a18;--texto-muted:#7a7a72;--borda:#e2ddd0;--branco:#ffffff;--ouro:#c8960c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto);min-height:100vh}
+.header{background:var(--verde);padding:10px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.2)}
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.header-brand{display:flex;align-items:center;gap:10px}
+.logo-box{width:40px;height:40px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.logo-box span{font-size:5px;color:#333;letter-spacing:1px;text-transform:uppercase}
+.logo-box strong{font-size:8px;font-family:"Playfair Display",serif;color:#1a1a18;line-height:1;text-align:center}
+.logo-box small{font-size:5px;color:#555;letter-spacing:1px;margin-top:1px}
+.header-title h1{font-family:"Playfair Display",serif;font-size:15px;color:white;font-weight:700;line-height:1.2}
+.header-title p{font-size:10px;color:rgba(255,255,255,0.7);margin-top:1px}
+.header-btns{display:flex;gap:6px;flex-shrink:0}
+.btn-nav{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:16px;font-size:11px;cursor:pointer;text-decoration:none;font-family:"DM Sans",sans-serif;white-space:nowrap}
+.btn-coletar{background:var(--ouro);border:none;color:white;padding:6px 12px;border-radius:16px;font-size:11px;cursor:pointer;font-family:"DM Sans",sans-serif;font-weight:500;white-space:nowrap}
+.container{max-width:600px;margin:0 auto;padding:16px 12px}
+.atualizado{font-size:10px;color:var(--texto-muted);text-align:right;margin-bottom:12px}
+.section-title{font-family:"Playfair Display",serif;font-size:18px;margin-bottom:12px;margin-top:4px}
+.kpi-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px;padding-bottom:4px}
+.kpi-scroll::-webkit-scrollbar{height:3px}
+.kpi-scroll::-webkit-scrollbar-thumb{background:var(--borda);border-radius:2px}
+.kpi-row{display:flex;gap:10px;min-width:max-content}
+.kpi{background:var(--branco);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;text-align:center;min-width:130px}
+.kpi-icon{font-size:18px;margin-bottom:4px}
+.kpi-label{font-size:9px;color:var(--texto-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.kpi-val{font-size:18px;font-weight:700;font-family:"Playfair Display",serif;color:var(--verde)}
+.kpi-sub{font-size:9px;color:var(--texto-muted);margin-top:2px}
+.cards-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+.card{background:var(--branco);border-radius:12px;padding:14px;border:1px solid var(--borda);position:relative}
+.card.nos{border:2px solid var(--verde);background:var(--verde-pale)}
+.rank{position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;color:var(--texto-muted)}
+.rank.ouro{color:var(--ouro)}
+.card-nome{font-size:22px;font-weight:700;margin-bottom:2px}
+.card-user{font-size:11px;color:var(--texto-muted);margin-bottom:10px}
+.card-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.metric-box{background:var(--creme);border-radius:8px;padding:7px 6px;text-align:center}
+.metric-label{font-size:10px;color:var(--texto);font-weight:600;text-transform:uppercase;letter-spacing:0.2px;margin-bottom:2px}
+.metric-val{font-size:15px;font-weight:700;color:var(--verde);font-family:"Playfair Display",serif}
+.metric-val.destaque{color:var(--vermelho);font-size:22px;font-weight:700}
+.bar{height:3px;background:#eee;border-radius:2px;margin-top:8px}
+.bar-fill{height:100%;background:var(--verde);border-radius:2px;transition:width 0.6s}
+.badge-nos{display:inline-block;background:var(--verde);color:white;font-size:8px;padding:1px 5px;border-radius:8px;margin-left:5px;vertical-align:middle;font-weight:600}
+.charts-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px;padding-bottom:4px}
+.charts-row{display:flex;gap:12px;min-width:max-content}
+.chart-box{background:var(--branco);border-radius:12px;padding:16px;border:1px solid var(--borda);min-width:280px}
+.chart-label{font-size:13px;font-weight:500;color:var(--texto);margin-bottom:3px}
+.chart-sub{font-size:10px;color:var(--texto-muted);margin-bottom:12px}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px}
+.table-scroll::-webkit-scrollbar{height:3px}
+.box-full{background:var(--branco);border-radius:12px;padding:16px;border:1px solid var(--borda);margin-bottom:20px}
+.eng-table{width:100%;border-collapse:collapse;font-size:12px;min-width:520px}
+.eng-table th{text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;color:var(--texto-muted);border-bottom:2px solid var(--borda)}
+.eng-table td{padding:8px 10px;border-bottom:1px solid var(--borda);white-space:nowrap}
+.eng-table tr:last-child td{border-bottom:none}
+.eng-table tr.nos-row td{background:var(--verde-pale)}
+.eng-bar{height:5px;background:#eee;border-radius:3px;min-width:50px}
+.eng-bar-fill{height:100%;background:var(--verde);border-radius:3px}
+.eng-val{font-weight:600;color:var(--verde);font-family:"Playfair Display",serif}
+.eng-val.top{color:var(--ouro)}
+.media-box{background:var(--branco);border-radius:12px;padding:16px;border:1px solid var(--borda);margin-bottom:20px}
+.media-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.media-row{display:flex;gap:10px;min-width:max-content;margin-top:12px}
+.media-card{background:var(--creme);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--borda);min-width:120px}
+.media-card.nos{border:2px solid var(--verde);background:var(--verde-pale)}
+.media-nome{font-size:10px;font-weight:600;margin-bottom:8px}
+.media-stat{margin-bottom:5px}
+.media-stat-label{font-size:8px;color:var(--texto-muted);text-transform:uppercase}
+.media-stat-val{font-size:13px;font-weight:700;font-family:"Playfair Display",serif;color:var(--verde)}
+.tabs-pizzaria{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;background:var(--bege);padding:4px;border-radius:10px;border:1px solid var(--borda);margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.tabs-pizzaria::-webkit-scrollbar{height:0}
+.tab-p{padding:7px 12px;font-size:11px;border-radius:7px;cursor:pointer;border:none;background:transparent;font-family:"DM Sans",sans-serif;color:var(--texto-muted);white-space:nowrap;flex-shrink:0}
+.tab-p.ativo{background:white;color:var(--texto);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.posts-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.post-card{background:var(--branco);border-radius:12px;padding:14px;border:1px solid var(--borda);text-decoration:none;color:inherit;display:block}
+.post-rank{font-size:10px;color:var(--texto-muted);text-transform:uppercase;letter-spacing:0.4px}
+.post-curtidas{font-size:13px;font-weight:700;color:var(--verde)}
+.post-texto{font-size:12px;color:#555;font-style:italic;line-height:1.4;margin:6px 0}
+.post-meta{font-size:11px;color:var(--texto-muted)}
+.loading{color:#999;font-size:13px;padding:16px}
+.precos-box{background:var(--branco);border-radius:12px;border:1px solid var(--borda);padding:16px;margin-bottom:20px}
+.precos-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+.btn-edit-precos{background:var(--verde);color:white;border:none;padding:7px 14px;border-radius:16px;font-size:11px;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap;flex-shrink:0}
+.edit-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:14px;display:none}
+.edit-table-scroll.show{display:block}
+.edit-table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}
+.edit-table th{text-align:left;padding:7px 8px;font-size:10px;text-transform:uppercase;color:var(--texto-muted);border-bottom:2px solid var(--borda)}
+.edit-table td{padding:7px 8px;border-bottom:1px solid var(--borda)}
+.edit-table tr.nos-edit td{background:var(--verde-pale)}
+.price-input{border:1px solid var(--borda);border-radius:6px;padding:5px 7px;font-size:12px;width:90px;font-family:"DM Sans",sans-serif}
+.price-input:focus{outline:none;border-color:var(--verde)}
+.obs-input{border:1px solid var(--borda);border-radius:6px;padding:5px 7px;font-size:11px;width:140px;font-family:"DM Sans",sans-serif}
+.obs-input:focus{outline:none;border-color:var(--verde)}
+.btn-salvar-precos{background:var(--ouro);color:white;border:none;padding:8px 18px;border-radius:16px;font-size:12px;cursor:pointer;font-family:"DM Sans",sans-serif;margin-top:12px;display:none}
+.kpi-precos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0}
+.kpi-p{background:var(--creme);border:1px solid var(--borda);border-radius:10px;padding:10px;text-align:center}
+.kpi-p-label{font-size:9px;color:var(--texto-muted);text-transform:uppercase;margin-bottom:3px}
+.kpi-p-val{font-size:16px;font-weight:700;font-family:"Playfair Display",serif;color:var(--verde)}
+.kpi-p-sub{font-size:9px;color:var(--texto-muted);margin-top:2px}
+.precos-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+.preco-card{background:var(--creme);border-radius:10px;padding:14px;border:1px solid var(--borda)}
+.preco-card.nos-p{border:2px solid var(--verde);background:var(--verde-pale)}
+.preco-card.mais-barato{border:2px solid #27ae60}
+.preco-card.mais-caro{border:2px solid var(--vermelho)}
+.preco-card-nome{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.badge-p{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600}
+.badge-nos-p{background:var(--verde);color:white}
+.badge-barato{background:#27ae60;color:white}
+.badge-caro{background:var(--vermelho);color:white}
+.preco-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.preco-item{background:var(--branco);border-radius:8px;padding:8px;text-align:center}
+.preco-label{font-size:9px;color:var(--texto-muted);text-transform:uppercase;margin-bottom:3px}
+.preco-val{font-size:16px;font-weight:700;font-family:"Playfair Display",serif;color:var(--verde)}
+.preco-val.sem{color:#ccc;font-size:12px;font-weight:400}
+.preco-media-row{display:flex;justify-content:space-between;border-top:1px solid var(--borda);padding-top:8px;font-size:12px;color:var(--texto-muted)}
+.preco-media-row strong{font-size:14px;color:var(--texto)}
+.bar-preco{height:4px;background:#eee;border-radius:2px;margin-top:8px}
+.bar-preco-fill{height:100%;border-radius:2px;transition:width 0.5s}
+.hbar-list{margin-top:14px}
+.hbar-item{margin-bottom:10px}
+.hbar-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.hbar-name{font-weight:500}
+.hbar-val{color:var(--verde);font-weight:600}
+.hbar-track{height:8px;background:#eee;border-radius:4px}
+.hbar-fill{height:100%;border-radius:4px;transition:width 0.6s}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media(min-width:600px){
+  .header{padding:0 32px}
+  .header-top{padding:12px 0}
+  .logo-box{width:64px;height:64px}
+  .logo-box span{font-size:7px}
+  .logo-box strong{font-size:10px}
+  .logo-box small{font-size:6px}
+  .header-title h1{font-size:20px}
+  .header-title p{font-size:12px}
+  .btn-nav,.btn-coletar{font-size:12px;padding:7px 16px}
+  .container{padding:28px 16px;max-width:1000px}
+  .kpi-scroll{overflow-x:visible}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);min-width:auto}
+  .kpi{min-width:auto}
+  .cards-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+  .charts-scroll{overflow-x:visible}
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;min-width:auto}
+  .chart-box{min-width:auto}
+  .media-scroll{overflow-x:visible}
+  .media-row{display:grid;grid-template-columns:repeat(6,1fr);min-width:auto}
+  .media-card{min-width:auto}
+  .posts-grid{grid-template-columns:repeat(3,1fr)}
+  .kpi-precos{grid-template-columns:repeat(4,1fr)}
+  .precos-grid{grid-template-columns:repeat(3,1fr)}
+  .tabs-pizzaria{flex-wrap:wrap;overflow-x:visible}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="header-brand">
+      <div class="logo-box">
+        <span>Pizzaria</span>
+        <strong>AEsperancA</strong>
+        <small>Desde 1957</small>
+      </div>
+      <div class="header-title">
+        <h1>Inteligencia Competitiva</h1>
+        <p>Monitoramento — Instagram</p>
+      </div>
+    </div>
+    <div class="header-btns">
+      <a href="/" class="btn-nav">Dashboard</a>
+      <button class="btn-coletar" onclick="coletarCurtidas()" id="btn-coletar">↻ Coletar</button>
+      <button class="btn-nav" onclick="carregar()">Atualizar</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="atualizado" id="atualizado">Carregando...</div>
+  <div class="kpi-scroll">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-icon">👥</div><div class="kpi-label">Maior Seguidor</div><div class="kpi-val" id="kpi-seg">—</div><div class="kpi-sub" id="kpi-seg-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">📸</div><div class="kpi-label">Mais Posts</div><div class="kpi-val" id="kpi-posts">—</div><div class="kpi-sub" id="kpi-posts-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">❤️</div><div class="kpi-label">Mais Curtidas</div><div class="kpi-val" id="kpi-curt">—</div><div class="kpi-sub" id="kpi-curt-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">📊</div><div class="kpi-label">Maior Média/Post</div><div class="kpi-val" id="kpi-media">—</div><div class="kpi-sub" id="kpi-media-sub">—</div></div>
+      <div class="kpi"><div class="kpi-icon">🔥</div><div class="kpi-label">Maior Engajamento</div><div class="kpi-val" id="kpi-eng">—</div><div class="kpi-sub" id="kpi-eng-sub">—</div></div>
+    </div>
+  </div>
+  <div class="section-title">Ranking Completo</div>
+  <div class="cards-grid" id="cards"><p class="loading">Carregando...</p></div>
+  <div class="media-box">
+    <div class="chart-label">Comparativo de Médias por Pizzaria</div>
+    <div class="chart-sub">Média de curtidas por post</div>
+    <div class="media-scroll"><div class="media-row" id="media-row"></div></div>
+  </div>
+  <div class="charts-scroll">
+    <div class="charts-row">
+      <div class="chart-box"><div class="chart-label">Seguidores</div><div class="chart-sub">Total por pizzaria</div><canvas id="chart-seg" height="160"></canvas></div>
+      <div class="chart-box"><div class="chart-label">Quantidade de Posts</div><div class="chart-sub">Total de publicações</div><canvas id="chart-posts" height="160"></canvas></div>
+      <div class="chart-box"><div class="chart-label">Total de Curtidas</div><div class="chart-sub">Soma de todos os posts</div><canvas id="chart-curt" height="160"></canvas></div>
+      <div class="chart-box"><div class="chart-label">Média de Curtidas/Post</div><div class="chart-sub">Total curtidas ÷ posts</div><canvas id="chart-media" height="160"></canvas></div>
+    </div>
+  </div>
+  <div class="box-full">
+    <div class="chart-label">Análise Detalhada</div>
+    <div class="chart-sub" style="margin-bottom:12px">Engajamento = (Média/post ÷ Seguidores) × 1000</div>
+    <div class="table-scroll">
+      <table class="eng-table">
+        <thead><tr><th>#</th><th>Pizzaria</th><th>Seguidores</th><th>Posts</th><th>Curtidas</th><th>Média/Post</th><th>Engaj.</th><th>Barra</th></tr></thead>
+        <tbody id="eng-body"><tr><td colspan="8"><span class="loading">Carregando...</span></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="section-title">💰 Comparativo de Preços</div>
+  <div class="precos-box">
+    <div class="precos-header">
+      <div>
+        <div class="chart-label">Mussarela e Calabresa</div>
+        <div class="chart-sub">Cadastre os preços do cardápio de cada concorrente</div>
+      </div>
+      <button class="btn-edit-precos" id="btn-edit-precos" onclick="toggleEditPrecos()">✏️ Editar</button>
+    </div>
+    <div class="edit-table-scroll" id="edit-table-wrap">
+      <table class="edit-table">
+        <thead><tr><th>Pizzaria</th><th>🧀 Mussarela (R$)</th><th>🌶 Calabresa (R$)</th><th>📝 Observação</th></tr></thead>
+        <tbody id="edit-body"></tbody>
+      </table>
+    </div>
+    <button class="btn-salvar-precos" id="btn-salvar-precos" onclick="salvarPrecos()">💾 Salvar Preços</button>
+    <div class="kpi-precos">
+      <div class="kpi-p"><div class="kpi-p-label">🧀 Mussarela + barata</div><div class="kpi-p-val" id="kp-mb">—</div><div class="kpi-p-sub" id="kp-mb-n">—</div></div>
+      <div class="kpi-p"><div class="kpi-p-label">🌶 Calabresa + barata</div><div class="kpi-p-val" id="kp-cb">—</div><div class="kpi-p-sub" id="kp-cb-n">—</div></div>
+      <div class="kpi-p"><div class="kpi-p-label">📊 Menor média geral</div><div class="kpi-p-val" id="kp-med">—</div><div class="kpi-p-sub" id="kp-med-n">—</div></div>
+      <div class="kpi-p"><div class="kpi-p-label">🏠 Nossa posição</div><div class="kpi-p-val" id="kp-nos-rank">—</div><div class="kpi-p-sub">A EsperancA</div></div>
+    </div>
+    <div class="precos-grid" id="precos-grid"><p class="loading">Clique em "Editar" para cadastrar os preços.</p></div>
+    <div id="hbar-container" style="display:none;margin-top:16px">
+      <div class="chart-label">Ranking por Preço Médio</div>
+      <div class="chart-sub">Do mais barato ao mais caro</div>
+      <div class="hbar-list" id="hbar-list"></div>
+    </div>
+  </div>
+  <div class="section-title">Posts com Mais Curtidas</div>
+  <div class="tabs-pizzaria" id="tabs-p"></div>
+  <div id="posts-lista"><p class="loading">Selecione uma pizzaria acima.</p></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+let cSeg,cPosts,cCurt,cMedia;
+const CORES=["#2d6a2d","#c0392b","#8e44ad","#e67e22","#2980b9","#16a085"];
+const PIZZARIAS=[
+  {nome:"A EsperancA",    username:"aesperancapizzaria",nos:true},
+  {nome:"1900 Pizzeria",  username:"1900pizzeria",      nos:false},
+  {nome:"Cezanne",        username:"pizzeria_cezanne",  nos:false},
+  {nome:"SalaVip",        username:"salavip_pizzabar",  nos:false},
+  {nome:"Forno e Oregano",username:"fornoeoregano",     nos:false},
+  {nome:"Babbo Giovanni", username:"babbogiovannioficial",nos:false}
+];
+let ativa="aesperancapizzaria";
+let dadosSeg=[],dadosCurt=[];
+
+function fmt(n){return(n!==null&&n!==undefined&&n!=="")? Number(n).toLocaleString("pt-BR"):"—";}
+function fmtPct(n){return(n&&n>0)?n.toFixed(2)+"%":"—";}
+function fmtR(n){return n?"R$ "+Number(n).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";}
+function showToast(msg,dur=3000){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),dur);}
+
+async function carregar(){
+  try{
+    const[seg,curt]=await Promise.all([
+      fetch("/api/concorrentes").then(r=>r.json()),
+      fetch("/api/concorrentes/curtidas").then(r=>r.json())
+    ]);
+    dadosSeg=seg;dadosCurt=curt;renderTudo();
+  }catch(e){showToast("Erro ao carregar dados");}
+}
+
+function renderTudo(){
+  if(!dadosSeg.length)return;
+  const merged=dadosSeg.map(s=>{
+    const c=dadosCurt.find(x=>x.username===s.username)||{};
+    const curtidas=c.total_curtidas||0;
+    const media=s.posts>0?Math.round(curtidas/s.posts):0;
+    const eng=(s.seguidores>0&&media>0)?(media/s.seguidores*1000):0;
+    return{...s,total_curtidas:curtidas,media_curtidas:media,engajamento:eng};
+  });
+  document.getElementById("atualizado").textContent="Ultima coleta: "+dadosSeg[0].coletado_em;
+  const topSeg =[...merged].sort((a,b)=>b.seguidores-a.seguidores)[0];
+  const topPost=[...merged].sort((a,b)=>b.posts-a.posts)[0];
+  const topCurt=[...merged].sort((a,b)=>b.total_curtidas-a.total_curtidas)[0];
+  const topMed =[...merged].sort((a,b)=>b.media_curtidas-a.media_curtidas)[0];
+  const topEng =[...merged].sort((a,b)=>b.engajamento-a.engajamento)[0];
+  document.getElementById("kpi-seg").textContent    =fmt(topSeg.seguidores);
+  document.getElementById("kpi-seg-sub").textContent=topSeg.nome;
+  document.getElementById("kpi-posts").textContent  =fmt(topPost.posts);
+  document.getElementById("kpi-posts-sub").textContent=topPost.nome;
+  document.getElementById("kpi-curt").textContent   =fmt(topCurt.total_curtidas);
+  document.getElementById("kpi-curt-sub").textContent=topCurt.nome;
+  document.getElementById("kpi-media").textContent  =fmt(topMed.media_curtidas);
+  document.getElementById("kpi-media-sub").textContent=topMed.nome;
+  document.getElementById("kpi-eng").textContent    =fmtPct(topEng.engajamento);
+  document.getElementById("kpi-eng-sub").textContent=topEng.nome;
+  const maxSeg=merged[0].seguidores;
+  document.getElementById("cards").innerHTML=merged.map((d,i)=>`
+    <div class="card ${d.username==='aesperancapizzaria'?'nos':''}">
+      <div class="rank ${i===0?'ouro':''}">#${i+1}</div>
+      <div class="card-nome">${d.nome}${d.username==='aesperancapizzaria'?'<span class="badge-nos">NÓS</span>':''}</div>
+      <div class="card-user">@${d.username}</div>
+      <div class="card-metrics">
+        <div class="metric-box"><div class="metric-label">Seguidores</div><div class="metric-val">${fmt(d.seguidores)}</div></div>
+        <div class="metric-box"><div class="metric-label">Posts</div><div class="metric-val">${fmt(d.posts)}</div></div>
+        <div class="metric-box"><div class="metric-label">Curtidas</div><div class="metric-val">${fmt(d.total_curtidas)}</div></div>
+        <div class="metric-box"><div class="metric-label">Média/Post</div><div class="metric-val">${fmt(d.media_curtidas)}</div></div>
+      </div>
+      <div class="metric-box" style="margin-bottom:8px;background:var(--bege);border:1px solid var(--borda)">
+        <div class="metric-label" style="font-size:11px;font-weight:600;color:var(--texto)">🔥 Engajamento</div>
+        <div class="metric-val destaque">${fmtPct(d.engajamento)}</div>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:${maxSeg>0?(d.seguidores/maxSeg*100):0}%"></div></div>
+    </div>`).join("");
+  const sortedMedia=[...merged].sort((a,b)=>b.media_curtidas-a.media_curtidas);
+  document.getElementById("media-row").innerHTML=sortedMedia.map(d=>`
+    <div class="media-card ${d.username==='aesperancapizzaria'?'nos':''}">
+      <div class="media-nome">${d.nome}</div>
+      <div class="media-stat"><div class="media-stat-label">Média/Post</div><div class="media-stat-val">${fmt(d.media_curtidas)}</div></div>
+      <div class="media-stat"><div class="media-stat-label">Posts</div><div class="media-stat-val" style="font-size:11px">${fmt(d.posts)}</div></div>
+      <div class="media-stat"><div class="media-stat-label">Engaj.</div><div class="media-stat-val" style="font-size:11px;color:var(--vermelho)">${fmtPct(d.engajamento)}</div></div>
+    </div>`).join("");
+  const labels=merged.map(d=>d.nome.split(" ")[0]);
+  [cSeg,cPosts,cCurt,cMedia].forEach(c=>c&&c.destroy());
+  const opts=(cb)=>({plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>cb(ctx.raw)}}},scales:{x:{ticks:{maxRotation:0,font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:9}}}}});
+  cSeg  =new Chart(document.getElementById("chart-seg"),  {type:"bar",data:{labels,datasets:[{data:merged.map(d=>d.seguidores),backgroundColor:CORES,borderRadius:5}]},options:opts(v=>fmt(v)+" seg.")});
+  cPosts=new Chart(document.getElementById("chart-posts"), {type:"bar",data:{labels,datasets:[{data:merged.map(d=>d.posts),backgroundColor:CORES,borderRadius:5}]},options:opts(v=>fmt(v)+" posts")});
+  cCurt =new Chart(document.getElementById("chart-curt"),  {type:"bar",data:{labels,datasets:[{data:merged.map(d=>d.total_curtidas),backgroundColor:CORES,borderRadius:5}]},options:opts(v=>fmt(v)+" curtidas")});
+  cMedia=new Chart(document.getElementById("chart-media"), {type:"bar",data:{labels,datasets:[{data:merged.map(d=>d.media_curtidas),backgroundColor:CORES,borderRadius:5}]},options:opts(v=>fmt(v)+"/post")});
+  const sortedEng=[...merged].sort((a,b)=>b.engajamento-a.engajamento);
+  const maxEng=sortedEng[0].engajamento||1;
+  document.getElementById("eng-body").innerHTML=sortedEng.map((d,i)=>`
+    <tr class="${d.username==='aesperancapizzaria'?'nos-row':''}">
+      <td style="font-weight:700;color:${i===0?'var(--ouro)':'var(--texto-muted)'}">#${i+1}</td>
+      <td><strong>${d.nome}</strong>${d.username==='aesperancapizzaria'?'<span class="badge-nos">NÓS</span>':''}</td>
+      <td>${fmt(d.seguidores)}</td><td>${fmt(d.posts)}</td>
+      <td>${fmt(d.total_curtidas)}</td><td><strong>${fmt(d.media_curtidas)}</strong></td>
+      <td><span class="eng-val ${i===0?'top':''}">${fmtPct(d.engajamento)}</span></td>
+      <td><div class="eng-bar"><div class="eng-bar-fill" style="width:${(d.engajamento/maxEng*100).toFixed(1)}%"></div></div></td>
+    </tr>`).join("");
+}
+
+async function coletarCurtidas(){
+  const btn=document.getElementById("btn-coletar");
+  btn.textContent="Coletando...";btn.disabled=true;
+  try{await fetch("/api/concorrentes/curtidas/coletar",{method:"POST"});showToast("Coleta iniciada! Aguarde ~5 min e atualize.");}
+  catch(e){showToast("Erro ao iniciar coleta");}
+  setTimeout(()=>{btn.textContent="↻ Coletar";btn.disabled=false;},3000);
+}
+
+function renderTabs(){
+  document.getElementById("tabs-p").innerHTML=PIZZARIAS.map(p=>`
+    <button class="tab-p ${p.username===ativa?'ativo':''}" onclick="selecionarPizzaria('${p.username}')">${p.nome}</button>`).join("");
+}
+
+async function selecionarPizzaria(username){
+  ativa=username;renderTabs();
+  document.getElementById("posts-lista").innerHTML="<p class='loading'>Carregando posts...</p>";
+  try{
+    const posts=await fetch("/api/concorrentes/posts/"+username).then(r=>r.json());
+    if(!posts.length){document.getElementById("posts-lista").innerHTML="<p class='loading'>Nenhum post encontrado.</p>";return;}
+    document.getElementById("posts-lista").innerHTML=`<div class="posts-grid">${posts.slice(0,6).map((p,i)=>`
+      <a href="${p.link}" target="_blank" class="post-card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span class="post-rank">#${i+1} post</span>
+          <span class="post-curtidas">❤ ${fmt(p.curtidas)}</span>
+        </div>
+        <p class="post-texto">"${p.texto.substring(0,90)}${p.texto.length>90?"...":""}"</p>
+        <span class="post-meta">💬 ${p.comentarios} comentários</span>
+      </a>`).join("")}</div>`;
+  }catch(e){document.getElementById("posts-lista").innerHTML="<p class='loading'>Erro ao carregar posts.</p>";}
+}
+
+// ===== PRECOS - salva no servidor =====
+let precosCache={};
+
+async function carregarPrecos(){
+  try{
+    const rows=await fetch("/api/precos").then(r=>r.json());
+    precosCache={};
+    rows.forEach(r=>{precosCache[r.username]={mussarela:r.mussarela,calabresa:r.calabresa,obs:r.obs};});
+  }catch(e){console.log("Erro ao carregar precos");}
+  renderPrecos();
+}
+
+function getPrecos(){return precosCache;}
+
+let editandoPrecos=false;
+
+function toggleEditPrecos(){
+  editandoPrecos=!editandoPrecos;
+  const wrap=document.getElementById("edit-table-wrap");
+  const btnS=document.getElementById("btn-salvar-precos");
+  const btnE=document.getElementById("btn-edit-precos");
+  wrap.classList.toggle("show",editandoPrecos);
+  btnS.style.display=editandoPrecos?"inline-block":"none";
+  btnE.textContent=editandoPrecos?"❌ Cancelar":"✏️ Editar";
+  if(editandoPrecos)renderEditTable();
+}
+
+function renderEditTable(){
+  const precos=getPrecos();
+  document.getElementById("edit-body").innerHTML=PIZZARIAS.map(p=>`
+    <tr class="${p.nos?'nos-edit':''}">
+      <td><strong>${p.nome}</strong>${p.nos?' <span class="badge-nos">NOS</span>':''}</td>
+      <td><input class="price-input" type="number" step="0.01" placeholder="ex: 89.90"
+        id="muss_${p.username}" value="${precos[p.username]?.mussarela||''}"></td>
+      <td><input class="price-input" type="number" step="0.01" placeholder="ex: 79.90"
+        id="cal_${p.username}" value="${precos[p.username]?.calabresa||''}"></td>
+      <td><input class="obs-input" type="text" placeholder="ex: grande 8 fatias"
+        id="obs_${p.username}" value="${precos[p.username]?.obs||''}"></td>
+    </tr>`).join("");
+}
+
+async function salvarPrecos(){
+  const dados=PIZZARIAS.map(p=>{
+    const m=parseFloat(document.getElementById("muss_"+p.username)?.value);
+    const c=parseFloat(document.getElementById("cal_"+p.username)?.value);
+    const o=document.getElementById("obs_"+p.username)?.value||"";
+    return{username:p.username,nome:p.nome,mussarela:isNaN(m)?null:m,calabresa:isNaN(c)?null:c,obs:o};
+  });
+  try{
+    await fetch("/api/precos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(dados)});
+    dados.forEach(p=>{precosCache[p.username]={mussarela:p.mussarela,calabresa:p.calabresa,obs:p.obs};});
+    toggleEditPrecos();
+    renderPrecos();
+    showToast("Precos salvos no servidor!");
+  }catch(e){showToast("Erro ao salvar precos");}
+}
+
+function renderPrecos(){
+  const precos=getPrecos();
+  const dados=PIZZARIAS.map((p,i)=>{
+    const pr=precos[p.username]||{};
+    const m=pr.mussarela||null;
+    const c=pr.calabresa||null;
+    const media=(m&&c)?(m+c)/2:(m||c||null);
+    return{...p,mussarela:m,calabresa:c,media,obs:pr.obs||"",cor:CORES[i]};
+  });
+  const comDados=dados.filter(d=>d.media!==null);
+  if(comDados.length){
+    const minM=[...dados].filter(d=>d.mussarela).sort((a,b)=>a.mussarela-b.mussarela)[0];
+    const minC=[...dados].filter(d=>d.calabresa).sort((a,b)=>a.calabresa-b.calabresa)[0];
+    const sorted=[...comDados].sort((a,b)=>a.media-b.media);
+    const minMed=sorted[0];
+    const rankNos=sorted.findIndex(d=>d.nos)+1;
+    document.getElementById("kp-mb").textContent   =minM?fmtR(minM.mussarela):"—";
+    document.getElementById("kp-mb-n").textContent =minM?.nome||"—";
+    document.getElementById("kp-cb").textContent   =minC?fmtR(minC.calabresa):"—";
+    document.getElementById("kp-cb-n").textContent =minC?.nome||"—";
+    document.getElementById("kp-med").textContent  =fmtR(minMed?.media);
+    document.getElementById("kp-med-n").textContent=minMed?.nome||"—";
+    document.getElementById("kp-nos-rank").textContent=rankNos>0?"#"+rankNos+" em preco":"Sem dados";
+  }
+  const sorted=[...dados].filter(d=>d.media).sort((a,b)=>a.media-b.media);
+  const maxMed=sorted.length?sorted[sorted.length-1].media:1;
+  const maisBarato=sorted[0]?.username;
+  const maisCaro=sorted[sorted.length-1]?.username;
+  if(!dados.some(d=>d.mussarela||d.calabresa)){
+    document.getElementById("precos-grid").innerHTML='<p class="loading">Clique em "Editar" para cadastrar os precos.</p>';
+    return;
+  }
+  document.getElementById("precos-grid").innerHTML=dados.map(d=>`
+    <div class="preco-card ${d.nos?'nos-p':''} ${d.username===maisBarato&&d.media?'mais-barato':''} ${d.username===maisCaro&&d.media?'mais-caro':''}">
+      <div class="preco-card-nome">
+        <span>${d.nome}</span>
+        <span>
+          ${d.nos?'<span class="badge-p badge-nos-p">NOS</span>':''}
+          ${d.username===maisBarato&&d.media&&!d.nos?'<span class="badge-p badge-barato">+ barato</span>':''}
+          ${d.username===maisCaro&&d.media?'<span class="badge-p badge-caro">+ caro</span>':''}
+        </span>
+      </div>
+      <div class="preco-row-2">
+        <div class="preco-item"><div class="preco-label">Mussarela</div><div class="preco-val ${!d.mussarela?'sem':''}">${fmtR(d.mussarela)}</div></div>
+        <div class="preco-item"><div class="preco-label">Calabresa</div><div class="preco-val ${!d.calabresa?'sem':''}">${fmtR(d.calabresa)}</div></div>
+      </div>
+      ${d.obs?`<div style="font-size:10px;color:var(--texto-muted);margin-bottom:8px">${d.obs}</div>`:''}
+      <div class="preco-media-row"><span>Media</span><strong>${fmtR(d.media)}</strong></div>
+      <div class="bar-preco"><div class="bar-preco-fill" style="width:${d.media?((d.media/maxMed)*100).toFixed(1):0}%;background:${d.cor}"></div></div>
+    </div>`).join("");
+  if(sorted.length){
+    document.getElementById("hbar-container").style.display="block";
+    document.getElementById("hbar-list").innerHTML=sorted.map((d,i)=>`
+      <div class="hbar-item">
+        <div class="hbar-header"><span class="hbar-name">#${i+1} ${d.nome}${d.nos?' H':''}</span><span class="hbar-val">${fmtR(d.media)}</span></div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:${(d.media/maxMed*100).toFixed(1)}%;background:${d.cor}"></div></div>
+      </div>`).join("");
+  }
+}
+
+carregar();
+renderTabs();
+selecionarPizzaria("aesperancapizzaria");
+carregarPrecos();
+</script>
+</body>
+</html>
+""")
+f.close()
+print("OK")
