@@ -158,7 +158,7 @@ async function carregar(){
     const params = "filtro="+filtroAtivo+(data?"&data="+encodeURIComponent(data):"")+(pizzaria?"&pizzaria="+encodeURIComponent(pizzaria):"");
     const[ops,st]=await Promise.all([
       fetch("/api/oportunidades?"+params).then(r=>r.json()),
-      fetch("/api/stats?"+(data?"data="+encodeURIComponent(data):"")).then(r=>r.json())
+      fetch("/api/stats?"+params).then(r=>r.json())
     ]);
     document.getElementById("s-total").textContent=st.total;
     document.getElementById("s-urgentes").textContent=st.urgentes;

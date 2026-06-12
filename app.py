@@ -37,7 +37,8 @@ def api_oportunidades():
 @app.route("/api/stats")
 def api_stats():
     data = request.args.get("data", "")
-    return jsonify(stats(data))
+    pizzaria_id = request.args.get("pizzaria", "")
+    return jsonify(stats(data, pizzaria_id))
 
 @app.route("/api/datas")
 def api_datas():
