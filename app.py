@@ -10,6 +10,19 @@ app = Flask(__name__)
 def index():
     return render_template("dashboard.html")
 
+@app.route("/api/pizzarias")
+def api_pizzarias():
+    import sqlite3
+    from pathlib import Path
+    db = Path(__file__).parent / "esperanca.db"
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT id, nome, bairro FROM pizzarias ORDER BY nome")
+    rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+    return jsonify(rows)
+
 @app.route("/concorrentes")
 def concorrentes():
     return render_template("concorrentes.html")
@@ -18,7 +31,8 @@ def concorrentes():
 def api_oportunidades():
     filtro = request.args.get("filtro", "todas")
     data = request.args.get("data", "")
-    return jsonify(listar_oportunidades(filtro, data))
+    pizzaria_id = request.args.get("pizzaria", "")
+    return jsonify(listar_oportunidades(filtro, data, pizzaria_id))
 
 @app.route("/api/stats")
 def api_stats():
@@ -37,7 +51,8 @@ def api_responder(op_id):
 
 @app.route("/api/concorrentes")
 def api_concorrentes():
-    return jsonify(listar_concorrentes_atual())
+    pizzaria_id = request.args.get("pizzaria", "")
+    return jsonify(listar_concorrentes_atual(pizzaria_id if pizzaria_id else None))
 
 @app.route("/api/concorrentes/coletar", methods=["POST"])
 def api_coletar_concorrentes():

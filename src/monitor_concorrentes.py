@@ -212,17 +212,26 @@ def coletar_concorrentes():
             resultados.append(dados)
     return resultados
 
-def listar_concorrentes_atual():
+def listar_concorrentes_atual(pizzaria_id=None):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute("""
-        SELECT c1.* FROM concorrentes c1
-        INNER JOIN (
-            SELECT username, MAX(id) as max_id FROM concorrentes GROUP BY username
-        ) c2 ON c1.username = c2.username AND c1.id = c2.max_id
-        ORDER BY seguidores DESC
-    """)
+    if pizzaria_id:
+        c.execute("""
+            SELECT c1.* FROM concorrentes c1
+            INNER JOIN (
+                SELECT username, MAX(id) as max_id FROM concorrentes WHERE pizzaria_id=? GROUP BY username
+            ) c2 ON c1.username = c2.username AND c1.id = c2.max_id
+            ORDER BY seguidores DESC
+        """, (pizzaria_id,))
+    else:
+        c.execute("""
+            SELECT c1.* FROM concorrentes c1
+            INNER JOIN (
+                SELECT username, MAX(id) as max_id FROM concorrentes GROUP BY username
+            ) c2 ON c1.username = c2.username AND c1.id = c2.max_id
+            ORDER BY seguidores DESC
+        """)
     rows = [dict(r) for r in c.fetchall()]
     conn.close()
     return rows

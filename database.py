@@ -33,17 +33,18 @@ def listar_datas():
     conn.close()
     return datas
 
-def listar_oportunidades(filtro="todas", data=""):
+def listar_oportunidades(filtro="todas", data="", pizzaria_id=""):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     filtro_data = f" AND criado_em LIKE '{data}%'" if data else ""
+    filtro_pizzaria = f" AND pizzaria_id='{pizzaria_id}'" if pizzaria_id else ""
     if filtro == "urgentes":
-        c.execute(f"SELECT * FROM oportunidades WHERE urgente=1 AND respondida=0{filtro_data} ORDER BY criado_em DESC")
+        c.execute(f"SELECT * FROM oportunidades WHERE urgente=1 AND respondida=0{filtro_data}{filtro_pizzaria} ORDER BY criado_em DESC")
     elif filtro == "pendentes":
-        c.execute(f"SELECT * FROM oportunidades WHERE respondida=0{filtro_data} ORDER BY criado_em DESC")
+        c.execute(f"SELECT * FROM oportunidades WHERE respondida=0{filtro_data}{filtro_pizzaria} ORDER BY criado_em DESC")
     elif filtro == "respondidas":
-        c.execute(f"SELECT * FROM oportunidades WHERE respondida=1{filtro_data} ORDER BY criado_em DESC")
+        c.execute(f"SELECT * FROM oportunidades WHERE respondida=1{filtro_data}{filtro_pizzaria} ORDER BY criado_em DESC")
     else:
         c.execute(f"SELECT * FROM oportunidades WHERE 1=1{filtro_data} ORDER BY urgente DESC, criado_em DESC")
     rows = [dict(r) for r in c.fetchall()]
@@ -61,6 +62,7 @@ def stats(data=""):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     filtro_data = f" AND criado_em LIKE '{data}%'" if data else ""
+    filtro_pizzaria = f" AND pizzaria_id='{pizzaria_id}'" if pizzaria_id else ""
     c.execute(f"SELECT COUNT(*) FROM oportunidades WHERE 1=1{filtro_data}"); total = c.fetchone()[0]
     c.execute(f"SELECT COUNT(*) FROM oportunidades WHERE urgente=1 AND respondida=0{filtro_data}"); urgentes = c.fetchone()[0]
     c.execute(f"SELECT COUNT(*) FROM oportunidades WHERE respondida=1{filtro_data}"); respondidas = c.fetchone()[0]
