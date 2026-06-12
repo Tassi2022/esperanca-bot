@@ -102,6 +102,9 @@ body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto)
     </div>
     <div class="filtro-data-wrapper">
       <span class="filtro-data-label">Dia:</span>
+      <select class="filtro-data" id="filtro-pizzaria" onchange="carregar()">
+        <option value="">Todas as pizzarias</option>
+      </select>
       <select class="filtro-data" id="filtro-data" onchange="carregar()">
         <option value="">Todos os dias</option>
       </select>
@@ -113,6 +116,17 @@ body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto)
 </div>
 <script>
 let filtroAtivo="todas";
+
+async function carregarPizzarias(){
+  const pizzarias = await fetch("/api/pizzarias").then(r=>r.json());
+  const sel = document.getElementById("filtro-pizzaria");
+  pizzarias.forEach(p=>{
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.nome;
+    sel.appendChild(opt);
+  });
+}
 
 async function carregarDatas(){
   const datas = await fetch("/api/datas").then(r=>r.json());
@@ -140,7 +154,8 @@ function filtrar(f){
 async function carregar(){
   try{
     const data = document.getElementById("filtro-data").value;
-    const params = "filtro="+filtroAtivo+(data?"&data="+encodeURIComponent(data):"");
+    const pizzaria = document.getElementById("filtro-pizzaria").value;
+    const params = "filtro="+filtroAtivo+(data?"&data="+encodeURIComponent(data):"")+(pizzaria?"&pizzaria="+encodeURIComponent(pizzaria):"");
     const[ops,st]=await Promise.all([
       fetch("/api/oportunidades?"+params).then(r=>r.json()),
       fetch("/api/stats?"+(data?"data="+encodeURIComponent(data):"")).then(r=>r.json())
@@ -187,6 +202,7 @@ async function responder(id,valor){
 }
 
 carregarDatas();
+carregarPizzarias();
 carregar();
 setInterval(carregar,60000);
 </script>
