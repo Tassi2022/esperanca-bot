@@ -206,6 +206,9 @@ body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto)
     </div>
     <div class="header-btns">
       <a href="/" class="btn-nav">Dashboard</a>
+      <select id="filtro-pizzaria" onchange="carregar()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 12px;border-radius:16px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <option value="">Todas as pizzarias</option>
+      </select>
       <button class="btn-coletar" onclick="coletarCurtidas()" id="btn-coletar">↻ Coletar</button>
       <button class="btn-nav" onclick="carregar()">Atualizar</button>
     </div>
@@ -350,11 +353,25 @@ function fmtPct(n){return(n&&n>0)?n.toFixed(2)+"%":"—";}
 function fmtR(n){return n?"R$ "+Number(n).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";}
 function showToast(msg,dur=3000){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),dur);}
 
+async function carregarPizzarias(){
+  try{
+    const pizzarias = await fetch("/api/pizzarias").then(r=>r.json());
+    const sel = document.getElementById("filtro-pizzaria");
+    pizzarias.forEach(p=>{
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = p.nome;
+      sel.appendChild(opt);
+    });
+  }catch(e){ console.error("Erro ao carregar pizzarias", e); }
+}
+
 async function carregar(){
   try{
+    const pizzaria = document.getElementById("filtro-pizzaria")?.value || "";
     const[seg,curt]=await Promise.all([
-      fetch("/api/concorrentes").then(r=>r.json()),
-      fetch("/api/concorrentes/curtidas").then(r=>r.json())
+      fetch("/api/concorrentes"+(pizzaria?"?pizzaria="+pizzaria:"")).then(r=>r.json()),
+      fetch("/api/concorrentes/curtidas"+(pizzaria?"?pizzaria="+pizzaria:"")).then(r=>r.json())
     ]);
     dadosSeg=seg;dadosCurt=curt;renderTudo();
   }catch(e){showToast("Erro ao carregar dados");}
@@ -822,6 +839,7 @@ function renderHistorico(){
   });
 }
 
+carregarPizzarias();
 carregar();
 renderTabs();
 selecionarPizzaria("aesperancapizzaria");
