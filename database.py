@@ -58,7 +58,7 @@ def marcar_respondida(op_id, valor):
     conn.commit()
     conn.close()
 
-def stats(data=""):
+def stats(data="", pizzaria_id=""):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     filtro_data = f" AND criado_em LIKE '{data}%'" if data else ""
