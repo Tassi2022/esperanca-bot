@@ -100,14 +100,72 @@ def buscar_historico_nova_api(username):
         time.sleep(2)
     return historico
 
-CONCORRENTES = [
-    {"nome": "A EsperancA",    "username": "aesperancapizzaria"},
-    {"nome": "1900 Pizzeria",  "username": "1900pizzeria"},
-    {"nome": "Cezanne",        "username": "pizzeria_cezanne"},
-    {"nome": "SalaVip",        "username": "salavip_pizzabar"},
-    {"nome": "Forno e Oregano","username": "fornoeoregano"},
-    {"nome": "Babbo Giovanni", "username": "babbogiovannioficial"},
-]
+# Concorrentes por pizzaria
+CONCORRENTES_POR_PIZZARIA = {
+    "esperanca": [
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+        {"nome": "Cezanne",          "username": "pizzeria_cezanne"},
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Sala VIP",         "username": "salavip_pizzabar"},
+        {"nome": "Forno e Oregano",  "username": "fornoeoregano"},
+    ],
+    "alphaville": [
+        {"nome": "Casa da Pizza",    "username": "casadapizza.com.br"},
+        {"nome": "Soggiorno",        "username": "pizzariasoggiorno"},
+        {"nome": "Tarantella",       "username": "tarantellapizzaria"},
+        {"nome": "La Fiorella",      "username": "lafiorella"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+    ],
+    "brooklin": [
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Camelo",           "username": "pizzariacamelo"},
+        {"nome": "Micheluccio",      "username": "michelucciopizzaria"},
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+        {"nome": "Casa da Pizza",    "username": "casadapizza.com.br"},
+    ],
+    "itaim": [
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Camelo",           "username": "pizzariacamelo"},
+        {"nome": "Micheluccio",      "username": "michelucciopizzaria"},
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+        {"nome": "Casa da Pizza",    "username": "casadapizza.com.br"},
+    ],
+    "morumbi": [
+        {"nome": "Micheluccio",      "username": "michelucciopizzaria"},
+        {"nome": "Bella Italia",     "username": "bellaitaliapizzaria"},
+        {"nome": "Casa da Pizza",    "username": "casadapizza.com.br"},
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+    ],
+    "saude": [
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+        {"nome": "Cezanne",          "username": "pizzeria_cezanne"},
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Sala VIP",         "username": "salavip_pizzabar"},
+        {"nome": "Forno e Oregano",  "username": "fornoeoregano"},
+    ],
+    "vl_madalena": [
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+        {"nome": "Casa da Pizza",    "username": "casadapizza.com.br"},
+        {"nome": "Rascal",           "username": "rascalrestaurante"},
+    ],
+    "vl_mariana": [
+        {"nome": "Veridiana",        "username": "veridianapizzaria"},
+        {"nome": "Cezanne",          "username": "pizzeria_cezanne"},
+        {"nome": "Braz",             "username": "brazpizzaria"},
+        {"nome": "Micheluccio",      "username": "michelucciopizzaria"},
+        {"nome": "Pizza da Mooca",   "username": "pizzadamooca"},
+        {"nome": "1900 Pizzeria",    "username": "1900pizzeria"},
+    ],
+}
+
+# Lista padrão (compatibilidade)
+CONCORRENTES = CONCORRENTES_POR_PIZZARIA.get("esperanca", [])
 
 DB_PATH = Path(__file__).parent.parent / "esperanca.db"
 
