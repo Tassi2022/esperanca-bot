@@ -249,24 +249,26 @@ def buscar_posts_e_curtidas_24meses(username):
         logger.error(f"Erro posts24 {username}: {e}")
     return total_posts, total_curtidas
 
-def salvar_concorrente(dados):
+def salvar_concorrente(dados, pizzaria_id="esperanca"):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("INSERT INTO concorrentes (username,nome,seguidores,seguindo,posts,coletado_em) VALUES (?,?,?,?,?,?)",
+    c.execute("INSERT INTO concorrentes (username,nome,seguidores,seguindo,posts,coletado_em,pizzaria_id) VALUES (?,?,?,?,?,?,?)",
         (dados["username"], dados["nome"], dados["seguidores"],
-         dados["seguindo"], dados["posts"], datetime.now().strftime("%d/%m %H:%M")))
+         dados["seguindo"], dados["posts"], datetime.now().strftime("%d/%m %H:%M"), pizzaria_id))
     conn.commit()
     conn.close()
 
-def coletar_concorrentes():
+def coletar_concorrentes(pizzaria_id=None):
     init_db_concorrentes()
     resultados = []
-    for c in CONCORRENTES:
+    lista = CONCORRENTES_POR_PIZZARIA.get(pizzaria_id, CONCORRENTES) if pizzaria_id else CONCORRENTES
+    for c in lista:
         logger.info(f"Buscando {c['username']}...")
         dados = buscar_perfil(c["username"])
         if dados:
             dados["nome"] = c["nome"]
-            salvar_concorrente(dados)
+            dados["pizzaria_id"] = pizzaria_id or "esperanca"
+            salvar_concorrente(dados, pizzaria_id or "esperanca")
             resultados.append(dados)
     return resultados
 

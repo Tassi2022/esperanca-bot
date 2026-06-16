@@ -57,7 +57,8 @@ def api_concorrentes():
 
 @app.route("/api/concorrentes/coletar", methods=["POST"])
 def api_coletar_concorrentes():
-    resultados = coletar_concorrentes()
+    pizzaria_id = request.json.get("pizzaria_id", "esperanca") if request.json else "esperanca"
+    resultados = coletar_concorrentes(pizzaria_id)
     return jsonify({"ok": True, "total": len(resultados)})
 
 @app.route("/api/concorrentes/posts/<username>")

@@ -517,11 +517,15 @@ function renderTudo(){
 
 async function coletarCurtidas(){
   const btn=document.getElementById("btn-coletar");
+  const pizzaria = document.getElementById("filtro-pizzaria")?.value || "esperanca";
   btn.textContent="Coletando...";btn.disabled=true;
-  try{await fetch("/api/concorrentes/curtidas/coletar",{method:"POST"});showToast("Coleta iniciada! Aguarde ~5 min e atualize.");}
+  try{
+    await fetch("/api/concorrentes/curtidas/coletar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pizzaria_id:pizzaria})});
+    await fetch("/api/concorrentes/coletar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pizzaria_id:pizzaria})});
+    showToast("Coleta iniciada! Aguarde ~5 min e atualize.");
+  }
   catch(e){showToast("Erro ao iniciar coleta");}
-  setTimeout(()=>{btn.textContent="↻ Coletar";btn.disabled=false;},3000);
-}
+  setTimeout(()=>{btn.textContent="↻ Coletar";btn.disabled=false;},3000);}
 
 function renderTabs(){
   document.getElementById("tabs-p").innerHTML=PIZZARIAS.map(p=>`
