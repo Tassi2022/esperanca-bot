@@ -311,3 +311,26 @@ def api_ifood_coletar_render():
             resultados.append({"nome": rest["nome"], "uuid": rest["uuid"], "erro": str(e)})
 
     return jsonify(resultados)
+
+@app.route("/api/ifood/debug")
+def api_ifood_debug():
+    import httpx
+    uuid = '0417766b-1fd7-4fc2-aa00-b9f8a1c19199'
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Origin": "https://www.ifood.com.br",
+        "Referer": "https://www.ifood.com.br/",
+        "content-type": "application/json",
+        "accept": "application/json",
+    }
+    query = "query M($id: String!) { merchant(merchantId: $id, required: true) { name userRating deliveryFee { value } deliveryMethods { minTime maxTime mode } minimumOrderValue } }"
+    try:
+        r = httpx.post(
+            "https://www.ifood.com.br/site-api/v1/merchant-info/graphql?latitude=-23.6012&longitude=-46.6358&channel=IFOOD",
+            headers=headers,
+            json={"query": query, "variables": {"id": uuid}},
+            timeout=20,
+        )
+        return jsonify({"status": r.status_code, "body": r.text[:500]})
+    except Exception as e:
+        return jsonify({"erro": str(e)})
