@@ -258,18 +258,34 @@ def salvar_concorrente(dados, pizzaria_id="esperanca"):
     conn.commit()
     conn.close()
 
+def ja_coletou_hoje(username, pizzaria_id):
+    from datetime import datetime
+    hoje = datetime.now().strftime("%d/%m")
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM concorrentes WHERE username=? AND pizzaria_id=? AND coletado_em LIKE ?",
+              (username, pizzaria_id, f"{hoje}%"))
+    count = c.fetchone()[0]
+    conn.close()
+    return count > 0
+
 def coletar_concorrentes(pizzaria_id=None):
     init_db_concorrentes()
     resultados = []
     lista = CONCORRENTES_POR_PIZZARIA.get(pizzaria_id, CONCORRENTES) if pizzaria_id else CONCORRENTES
+    pid = pizzaria_id or "esperanca"
     for c in lista:
+        if ja_coletou_hoje(c["username"], pid):
+            logger.info(f"Ja coletou hoje {c['username']} - pulando")
+            continue
         logger.info(f"Buscando {c['username']}...")
         dados = buscar_perfil(c["username"])
         if dados:
             dados["nome"] = c["nome"]
-            dados["pizzaria_id"] = pizzaria_id or "esperanca"
-            salvar_concorrente(dados, pizzaria_id or "esperanca")
+            dados["pizzaria_id"] = pid
+            salvar_concorrente(dados, pid)
             resultados.append(dados)
+        time.sleep(4)
     return resultados
 
 def listar_concorrentes_atual(pizzaria_id=None):
