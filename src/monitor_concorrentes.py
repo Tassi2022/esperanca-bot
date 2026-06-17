@@ -57,7 +57,7 @@ def buscar_posts_nova_api(username, paginas=3):
         cursor = data.get("next_max_id") or data.get("items_cursor")
         if not cursor:
             break
-        time.sleep(2)
+        time.sleep(4)
     return sorted(todos, key=lambda x: x["curtidas"], reverse=True)
 
 def buscar_historico_nova_api(username):
@@ -97,7 +97,7 @@ def buscar_historico_nova_api(username):
         if not cursor:
             break
         paginas += 1
-        time.sleep(2)
+        time.sleep(4)
     return historico
 
 # Concorrentes por pizzaria
@@ -244,7 +244,7 @@ def buscar_posts_e_curtidas_24meses(username):
             paginas += 1
             if not pagination_token:
                 break
-            time.sleep(2)
+            time.sleep(4)
     except Exception as e:
         logger.error(f"Erro posts24 {username}: {e}")
     return total_posts, total_curtidas
@@ -346,7 +346,7 @@ def buscar_posts_perfil(username, count=12):
             paginas += 1
             if not pagination_token:
                 break
-            time.sleep(1)
+            time.sleep(3)
     except Exception as e:
         logger.error(f"Erro ao buscar posts {username}: {e}")
     return sorted(todos_posts, key=lambda x: x["curtidas"], reverse=True)[:count]
@@ -385,7 +385,7 @@ def buscar_total_curtidas(username):
             paginas += 1
             if not pagination_token:
                 break
-            time.sleep(2)
+            time.sleep(4)
     except Exception as e:
         logger.error(f"Erro curtidas {username}: {e}")
     return total
@@ -488,7 +488,7 @@ def buscar_historico_mensal(username):
             paginas += 1
             if not pagination_token:
                 break
-            time.sleep(1)
+            time.sleep(3)
     except Exception as e:
         logger.error(f"Erro historico {username}: {e}")
     return historico
