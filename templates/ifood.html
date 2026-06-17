@@ -241,6 +241,16 @@ body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto)
     </div>
   </div>
 
+  <!-- ═══ EDIÇÃO MANUAL — Taxa, Tempo, Preço Pizza ════════════════════ -->
+  <div class="section-title">✏️ Atualizar Dados de Entrega</div>
+  <div class="busca-box">
+    <div class="chart-label">Taxa, Tempo e Preço da Pizza 8 pedaços</div>
+    <div class="chart-sub">Consulte o iFood no celular e atualize abaixo — clique em Salvar quando terminar</div>
+    <div id="manual-campos" style="margin-top:14px"></div>
+    <button class="btn-buscar" onclick="salvarManual()" style="margin-top:12px;display:none" id="btn-salvar-manual">💾 Salvar Dados</button>
+    <span id="manual-status" style="font-size:11px;color:var(--texto-muted);margin-left:10px"></span>
+  </div>
+
   <!-- ═══ BUSCA POR CATEGORIA/REGIÃO ═══════════════════════════════════ -->
   <div class="section-title">🔍 Buscar por Categoria e Região</div>
   <div class="busca-box">
@@ -295,10 +305,10 @@ function showToast(msg, dur=3500) {
   setTimeout(() => t.classList.remove("show"), dur);
 }
 
-// ── Carrega dados dos concorrentes ──────────────────────────────────────
+// ── Carrega dados completos (automático + manual) ───────────────────────
 async function carregar() {
   try {
-    const dados = await fetch("/api/ifood/concorrentes").then(r => r.json());
+    const dados = await fetch("/api/ifood/completo").then(r => r.json());
     if (!dados.length) {
       document.getElementById("cards").innerHTML =
         '<p class="empty">Nenhum dado ainda. Clique em "↻ Coletar" para buscar os dados do iFood.</p>';
@@ -306,6 +316,7 @@ async function carregar() {
       return;
     }
     renderTudo(dados);
+    renderFormManual(dados);
   } catch(e) {
     showToast("Erro ao carregar dados");
     console.error(e);
@@ -578,6 +589,76 @@ async function buscarCategoria() {
   } catch(e) {
     res.innerHTML = '<p class="empty">Erro na busca. Tente novamente.</p>';
     console.error(e);
+  }
+}
+
+// ── Formulário de edição manual ──────────────────────────────────────────
+let _dadosManual = [];
+
+function renderFormManual(dados) {
+  _dadosManual = dados;
+  const container = document.getElementById("manual-campos");
+  container.innerHTML = dados.map((d, i) => `
+    <div style="background:var(--creme);border-radius:10px;padding:12px;border:1px solid var(--borda);margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">
+        ${d.nome} ${d.nos ? '<span class="badge-nos">NÓS</span>' : ''}
+        ${d.atualizado_em ? '<span style="font-size:9px;color:var(--texto-muted);margin-left:6px">atualizado ' + d.atualizado_em + '</span>' : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Taxa entrega (R$)</div>
+          <input class="busca-input" type="number" step="0.01" min="0"
+            id="taxa_${i}" value="${d.taxa_entrega !== null && d.taxa_entrega !== undefined ? d.taxa_entrega : ''}"
+            placeholder="0 = grátis" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
+        </div>
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Tempo entrega (min)</div>
+          <input class="busca-input" type="text"
+            id="tempo_${i}" value="${d.tempo_min && d.tempo_max ? d.tempo_min + '-' + d.tempo_max : d.tempo_min || ''}"
+            placeholder="ex: 30-45" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
+        </div>
+        <div style="grid-column:span 2">
+          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Preço pizza 8 pedaços (R$)</div>
+          <input class="busca-input" type="number" step="0.01" min="0"
+            id="pizza_${i}" value="${d.preco_pizza_8 || ''}"
+            placeholder="ex: 89.90" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function salvarManual() {
+  const payload = _dadosManual.map((d, i) => {
+    const taxaVal = parseFloat(document.getElementById(`taxa_${i}`)?.value);
+    const tempoStr = document.getElementById(`tempo_${i}`)?.value || "";
+    const pizzaVal = parseFloat(document.getElementById(`pizza_${i}`)?.value);
+    const tempoMatch = tempoStr.match(/(\d+)[-–](\d+)/);
+    const tempoSingle = tempoStr.match(/^(\d+)$/);
+    return {
+      uuid: d.uuid,
+      nome: d.nome,
+      taxa_entrega: isNaN(taxaVal) ? null : taxaVal,
+      taxa_gratis: taxaVal === 0,
+      tempo_min: tempoMatch ? parseInt(tempoMatch[1]) : (tempoSingle ? parseInt(tempoSingle[1]) : null),
+      tempo_max: tempoMatch ? parseInt(tempoMatch[2]) : (tempoSingle ? parseInt(tempoSingle[1]) : null),
+      preco_pizza_8: isNaN(pizzaVal) ? null : pizzaVal,
+    };
+  });
+
+  try {
+    const r = await fetch("/api/ifood/manual", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    document.getElementById("manual-status").textContent = "✅ " + (data.msg || "Salvo!");
+    document.getElementById("btn-salvar-manual").style.display = "none";
+    showToast("Dados salvos com sucesso!");
+    setTimeout(() => carregar(), 500);
+  } catch(e) {
+    showToast("Erro ao salvar dados");
   }
 }
 
