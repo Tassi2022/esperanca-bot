@@ -2,9 +2,27 @@ from flask import Flask, render_template, jsonify, request
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
+
 from database import listar_oportunidades, marcar_respondida, stats, listar_datas
-from src.monitor_concorrentes import listar_concorrentes_atual, coletar_concorrentes, buscar_perfil, buscar_user_id, listar_curtidas_concorrentes, salvar_curtidas, listar_curtidas_atual, buscar_posts_perfil, buscar_posts_e_curtidas_24meses
+from src.monitor_concorrentes import (
+    listar_concorrentes_atual, coletar_concorrentes, buscar_perfil,
+    buscar_user_id, listar_curtidas_concorrentes, salvar_curtidas,
+    listar_curtidas_atual, buscar_posts_perfil, buscar_posts_e_curtidas_24meses
+)
+# ── iFood ─────────────────────────────────────────────────────────────────────
+from src.monitor_ifood import (
+    coletar_todos_concorrentes, coletar_por_categoria,
+    listar_ifood_atual, listar_ifood_historico,
+    listar_categoria_atual, salvar_categoria,
+    init_ifood_db, RESTAURANTES_IFOOD
+)
+
 app = Flask(__name__)
+init_ifood_db()   # cria as tabelas do iFood se não existirem
+
+# =============================================================================
+# ROTAS EXISTENTES — Dashboard e Instagram
+# =============================================================================
 
 @app.route("/")
 def index():
@@ -13,7 +31,6 @@ def index():
 @app.route("/api/pizzarias")
 def api_pizzarias():
     import sqlite3
-    from pathlib import Path
     db = Path(__file__).parent / "esperanca.db"
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
@@ -90,7 +107,10 @@ def api_coletar_curtidas():
             db = Path(__file__).parent / "esperanca.db"
             conn = sqlite3.connect(db)
             c = conn.cursor()
-            c.execute("UPDATE concorrentes SET posts=? WHERE username=? AND id=(SELECT MAX(id) FROM concorrentes WHERE username=?)", (posts24, conc["username"], conc["username"]))
+            c.execute(
+                "UPDATE concorrentes SET posts=? WHERE username=? AND id=(SELECT MAX(id) FROM concorrentes WHERE username=?)",
+                (posts24, conc["username"], conc["username"])
+            )
             conn.commit()
             conn.close()
             time.sleep(15)
@@ -125,9 +145,10 @@ def api_save_precos():
             calabresa=excluded.calabresa, obs=excluded.obs,
             atualizado_em=excluded.atualizado_em""",
             (p["username"], p["nome"], p.get("mussarela"), p.get("calabresa"),
-             p.get("obs",""), datetime.now().strftime("%d/%m %H:%M")))
+             p.get("obs", ""), datetime.now().strftime("%d/%m %H:%M")))
     conn.commit()
     conn.close()
+
 @app.route("/api/concorrentes/historico")
 def api_historico():
     from src.monitor_concorrentes import listar_historico_mensal
@@ -149,7 +170,6 @@ def api_coletar_historico():
 @app.route("/api/concorrentes/seguidores-historico")
 def api_seguidores_historico():
     import sqlite3
-    from pathlib import Path
     db = Path(__file__).parent / "esperanca.db"
     conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
@@ -159,5 +179,135 @@ def api_seguidores_historico():
     conn.close()
     return jsonify(rows)
 
+
+# =============================================================================
+# ROTAS iFood — NOVAS
+# =============================================================================
+
+@app.route("/ifood")
+def ifood():
+    """Painel iFood — mesmo estilo do concorrentes.html."""
+    return render_template("ifood.html")
+
+@app.route("/api/ifood/concorrentes")
+def api_ifood_concorrentes():
+    """Snapshot mais recente de cada concorrente no iFood."""
+    return jsonify(listar_ifood_atual())
+
+@app.route("/api/ifood/concorrentes/coletar", methods=["POST"])
+def api_ifood_coletar():
+    """Dispara coleta de todos os concorrentes em background."""
+    import threading
+    dados = request.json or {}
+    cidade = dados.get("cidade", "sao-bernardo-do-campo-sp")
+
+    def coletar():
+        coletar_todos_concorrentes(cidade)
+
+    threading.Thread(target=coletar, daemon=True).start()
+    return jsonify({
+        "ok": True,
+        "msg": f"Coleta iniciada para {len(RESTAURANTES_IFOOD)} restaurantes. Aguarde ~2 min e clique em Atualizar."
+    })
+
+@app.route("/api/ifood/historico")
+def api_ifood_historico():
+    """Histórico de rating e taxa ao longo do tempo."""
+    return jsonify(listar_ifood_historico())
+
+@app.route("/api/ifood/categoria", methods=["POST"])
+def api_ifood_categoria():
+    """
+    Coleta restaurantes por categoria e cidade.
+    Body: { "categoria": "pizza", "cidade": "sao-bernardo-do-campo-sp", "max_itens": 15 }
+    """
+    import threading
+    dados = request.json or {}
+    categoria = dados.get("categoria", "pizza")
+    cidade    = dados.get("cidade", "sao-bernardo-do-campo-sp")
+    max_itens = int(dados.get("max_itens", 15))
+
+    def coletar():
+        itens = coletar_por_categoria(categoria, cidade, max_itens)
+        salvar_categoria(itens, categoria, cidade)
+
+    threading.Thread(target=coletar, daemon=True).start()
+    return jsonify({"ok": True, "msg": f"Buscando '{categoria}' em '{cidade}'..."})
+
+@app.route("/api/ifood/categoria/<categoria>")
+def api_ifood_categoria_dados(categoria):
+    """Retorna dados da última coleta de uma categoria."""
+    return jsonify(listar_categoria_atual(categoria))
+
+
+# =============================================================================
 if __name__ == "__main__":
     app.run(debug=True)
+# ── Rota iFood para Render (sem restrição de IP) ──────────────────────────────
+@app.route("/api/ifood/coletar-render")
+def api_ifood_coletar_render():
+    """
+    Rota que roda no Render (sem bloqueio de IP).
+    Busca dados do iFood via GraphQL e retorna JSON.
+    O PythonAnywhere chama esta rota e salva no banco local.
+    """
+    import httpx, json as json_lib
+
+    RESTAURANTES = [
+        {"nome": "A EsperancA",     "uuid": "0417766b-1fd7-4fc2-aa00-b9f8a1c19199"},
+        {"nome": "1900 Pizzeria",   "uuid": "b779bdec-2108-4ed4-93ad-24bb5a73c714"},
+        {"nome": "Cezanne",         "uuid": "d14fc179-a92a-48d8-b0e0-bad9002d6e41"},
+        {"nome": "SalaVip",         "uuid": "8847d86f-7cec-4407-8b57-14dd12427bf6"},
+        {"nome": "Forno e Oregano", "uuid": "8d3ffb5a-337e-45b7-baec-d46897e3c381"},
+        {"nome": "Babbo Giovanni",  "uuid": "f1908a34-f549-48bc-af3a-e5fa3ab41efc"},
+    ]
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Origin": "https://www.ifood.com.br",
+        "Referer": "https://www.ifood.com.br/",
+        "content-type": "application/json",
+        "accept": "application/json",
+    }
+
+    query = """query M($id: String!) {
+      merchant(merchantId: $id, required: true) {
+        name userRating available minimumOrderValue distance
+        mainCategory { name }
+        deliveryFee { value originalValue type }
+        deliveryMethods { minTime maxTime mode value originalValue }
+      }
+    }"""
+
+    resultados = []
+    for rest in RESTAURANTES:
+        try:
+            r = httpx.post(
+                "https://www.ifood.com.br/site-api/v1/merchant-info/graphql"
+                "?latitude=-23.6012&longitude=-46.6358&channel=IFOOD",
+                headers=headers,
+                json={"query": query, "variables": {"id": rest["uuid"]}},
+                timeout=15,
+            )
+            if r.status_code == 200:
+                data = r.json().get("data", {}).get("merchant", {})
+                delivery = next((d for d in (data.get("deliveryMethods") or []) if d.get("mode") == "DELIVERY"), {})
+                fee = data.get("deliveryFee") or {}
+                resultados.append({
+                    "nome": rest["nome"],
+                    "uuid": rest["uuid"],
+                    "rating": data.get("userRating"),
+                    "categoria": (data.get("mainCategory") or {}).get("name"),
+                    "taxa_entrega": fee.get("value"),
+                    "taxa_gratis": fee.get("value") == 0,
+                    "tempo_min": delivery.get("minTime"),
+                    "tempo_max": delivery.get("maxTime"),
+                    "pedido_minimo": data.get("minimumOrderValue"),
+                    "aberto": data.get("available", True),
+                    "distancia_km": data.get("distance"),
+                })
+            import time; time.sleep(1)
+        except Exception as e:
+            resultados.append({"nome": rest["nome"], "uuid": rest["uuid"], "erro": str(e)})
+
+    return jsonify(resultados)
