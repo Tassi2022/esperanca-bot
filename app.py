@@ -238,7 +238,117 @@ def api_ifood_categoria():
 def api_ifood_categoria_dados(categoria):
     """Retorna dados da última coleta de uma categoria."""
     return jsonify(listar_categoria_atual(categoria))
+# =============================================================================
+# Cole estas rotas no app.py, antes do if __name__ == "__main__"
+# =============================================================================
 
+@app.route("/api/ifood/manual")
+def api_ifood_manual():
+    """Retorna dados manuais (taxa, tempo, preço pizza)."""
+    import sqlite3
+    db = Path(__file__).parent / "esperanca.db"
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT * FROM ifood_manual ORDER BY nome")
+    rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route("/api/ifood/manual", methods=["POST"])
+def api_ifood_salvar_manual():
+    """Salva dados manuais (taxa, tempo, preço pizza)."""
+    import sqlite3
+    from datetime import datetime
+    db = Path(__file__).parent / "esperanca.db"
+    dados = request.json or []
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    agora = datetime.now().strftime("%d/%m %H:%M")
+    for item in dados:
+        c.execute("""
+            INSERT INTO ifood_manual (uuid, nome, taxa_entrega, taxa_gratis, tempo_min, tempo_max, preco_pizza_8, atualizado_em)
+            VALUES (?,?,?,?,?,?,?,?)
+            ON CONFLICT(uuid) DO UPDATE SET
+                taxa_entrega=excluded.taxa_entrega,
+                taxa_gratis=excluded.taxa_gratis,
+                tempo_min=excluded.tempo_min,
+                tempo_max=excluded.tempo_max,
+                preco_pizza_8=excluded.preco_pizza_8,
+                atualizado_em=excluded.atualizado_em
+        """, (
+            item.get("uuid"), item.get("nome"),
+            item.get("taxa_entrega"), 1 if item.get("taxa_gratis") else 0,
+            item.get("tempo_min"), item.get("tempo_max"),
+            item.get("preco_pizza_8"), agora,
+        ))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True, "msg": "Dados salvos!"})
+
+
+@app.route("/api/ifood/completo")
+def api_ifood_completo():
+    """
+    Combina dados automáticos (rating via API) com dados manuais (taxa, tempo, preço).
+    Este é o endpoint principal que o painel ifood.html usa.
+    """
+    import sqlite3
+    db = Path(__file__).parent / "esperanca.db"
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Rating automático (último snapshot de cada restaurante)
+    c.execute("""
+        SELECT * FROM ifood_restaurantes
+        WHERE id IN (SELECT MAX(id) FROM ifood_restaurantes GROUP BY uuid)
+    """)
+    automaticos = {r["uuid"]: dict(r) for r in c.fetchall()}
+
+    # Dados manuais
+    c.execute("SELECT * FROM ifood_manual")
+    manuais = {r["uuid"]: dict(r) for r in c.fetchall()}
+
+    conn.close()
+
+    # Combina os dois
+    RESTAURANTES = [
+        {"nome": "A EsperancA",     "uuid": "0417766b-1fd7-4fc2-aa00-b9f8a1c19199", "nos": True},
+        {"nome": "1900 Pizzeria",   "uuid": "b779bdec-2108-4ed4-93ad-24bb5a73c714", "nos": False},
+        {"nome": "Cezanne",         "uuid": "d14fc179-a92a-48d8-b0e0-bad9002d6e41", "nos": False},
+        {"nome": "SalaVip",         "uuid": "8847d86f-7cec-4407-8b57-14dd12427bf6", "nos": False},
+        {"nome": "Forno e Orégano", "uuid": "8d3ffb5a-337e-45b7-baec-d46897e3c381", "nos": False},
+        {"nome": "Veridiana",       "uuid": "65f84e1b-90ec-4753-8cb0-a6330539cc38", "nos": False},
+    ]
+
+    resultado = []
+    for rest in RESTAURANTES:
+        uuid = rest["uuid"]
+        auto = automaticos.get(uuid, {})
+        manual = manuais.get(uuid, {})
+        resultado.append({
+            "uuid": uuid,
+            "nome": rest["nome"],
+            "nos": rest["nos"],
+            # Automático
+            "rating": auto.get("rating"),
+            "total_avaliacoes": auto.get("total_avaliacoes"),
+            "categoria": auto.get("categoria") or "Pizza",
+            "pedido_minimo": auto.get("pedido_minimo") or manual.get("pedido_minimo"),
+            "aberto": _esta_aberto(),
+            "coletado_em": auto.get("coletado_em"),
+            # Manual
+            "taxa_entrega": manual.get("taxa_entrega"),
+            "taxa_gratis": bool(manual.get("taxa_gratis")),
+            "tempo_min": manual.get("tempo_min"),
+            "tempo_max": manual.get("tempo_max"),
+            "preco_pizza_8": manual.get("preco_pizza_8"),
+            "atualizado_em": manual.get("atualizado_em"),
+        })
+
+    return jsonify(resultado)
 
 # =============================================================================
 if __name__ == "__main__":
@@ -334,3 +444,20 @@ def api_ifood_debug():
         return jsonify({"status": r.status_code, "body": r.text[:500]})
     except Exception as e:
         return jsonify({"erro": str(e)})
+
+def _esta_aberto():
+    """Verifica se as pizzarias estão abertas agora (seg-sab 18h-23h30)."""
+    try:
+        from datetime import datetime
+        import pytz
+        sp = pytz.timezone('America/Sao_Paulo')
+        agora = datetime.now(sp)
+        dia = agora.weekday()  # 0=seg, 6=dom
+        hora = agora.hour + agora.minute / 60
+        if dia == 6:  # domingo fechado
+            return False
+        if dia in (4, 5):  # sex e sab até 23h30
+            return 18 <= hora < 23.5
+        return 18 <= hora < 23  # seg-qui até 23h
+    except Exception:
+        return False

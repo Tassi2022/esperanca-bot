@@ -28,7 +28,7 @@ RESTAURANTES_IFOOD = [
     {"nome": "Cezanne",         "uuid": "d14fc179-a92a-48d8-b0e0-bad9002d6e41", "nos": False},
     {"nome": "SalaVip",         "uuid": "8847d86f-7cec-4407-8b57-14dd12427bf6", "nos": False},
     {"nome": "Forno e Orégano", "uuid": "8d3ffb5a-337e-45b7-baec-d46897e3c381", "nos": False},
-    {"nome": "Babbo Giovanni",  "uuid": "f1908a34-f549-48bc-af3a-e5fa3ab41efc", "nos": False},
+    {"nome": "Veridiana",       "uuid": "65f84e1b-90ec-4753-8cb0-a6330539cc38", "nos": False},
 ]
 
 # Coordenadas do bairro Saúde — São Paulo
