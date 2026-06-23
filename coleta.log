@@ -39,3 +39,24 @@
 2026-06-03 16:12:54,366 Erro posts24 babbogiovannioficial: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
 2026-06-03 16:12:54,366 Posts: 0 | Curtidas: 0
 2026-06-03 16:14:24,404 === COLETA FINALIZADA ===
+2026-06-20 22:44:03,915 === INICIO COLETA AUTOMATICA ===
+2026-06-20 22:44:03,915 --- HISTORICO MENSAL ---
+2026-06-20 22:44:03,915 Historico: 1900pizzeria
+2026-06-20 22:44:03,930 Erro historico 1900pizzeria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:44:03,930 Meses encontrados: 0
+2026-06-20 22:45:33,930 Historico: pizzeria_cezanne
+2026-06-20 22:45:33,951 Erro historico pizzeria_cezanne: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:45:33,951 Meses encontrados: 0
+2026-06-20 22:47:03,952 Historico: veridianapizzaria
+2026-06-20 22:47:03,983 Erro historico veridianapizzaria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:47:03,983 Meses encontrados: 0
+2026-06-20 22:48:33,984 Historico: brazpizzaria
+2026-06-20 22:48:34,008 Erro historico brazpizzaria: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:48:34,008 Meses encontrados: 0
+2026-06-20 22:50:04,009 Historico: salavip_pizzabar
+2026-06-20 22:50:04,027 Erro historico salavip_pizzabar: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:50:04,028 Meses encontrados: 0
+2026-06-20 22:51:34,028 Historico: fornoeoregano
+2026-06-20 22:51:34,137 Erro historico fornoeoregano: 429 Client Error: Too Many Requests for url: https://instagram-scraper-stable-api.p.rapidapi.com/get_ig_user_posts.php
+2026-06-20 22:51:34,137 Meses encontrados: 0
+2026-06-20 22:53:04,138 Aguardando 10min antes de coletar curtidas...

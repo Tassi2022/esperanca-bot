@@ -241,11 +241,11 @@ body{font-family:"DM Sans",sans-serif;background:var(--creme);color:var(--texto)
     </div>
   </div>
 
-  <!-- ═══ EDIÇÃO MANUAL — Taxa, Tempo, Preço Pizza ════════════════════ -->
-  <div class="section-title">✏️ Atualizar Dados de Entrega</div>
+  <!-- ═══ EDIÇÃO MANUAL — Apenas Preço Pizza e Desconto ═══════════════ -->
+  <div class="section-title">✏️ Atualizar Preço e Desconto</div>
   <div class="busca-box">
-    <div class="chart-label">Taxa, Tempo e Preço da Pizza 8 pedaços</div>
-    <div class="chart-sub">Consulte o iFood no celular e atualize abaixo — clique em Salvar quando terminar</div>
+    <div class="chart-label">Preço da Pizza 8 pedaços e Desconto Ativo</div>
+    <div class="chart-sub">Rating, taxa, tempo e status já são automáticos — só preço e desconto precisam de atualização manual (1x por semana)</div>
     <div id="manual-campos" style="margin-top:14px"></div>
     <button class="btn-buscar" onclick="salvarManual()" style="margin-top:12px;display:none" id="btn-salvar-manual">💾 Salvar Dados</button>
     <span id="manual-status" style="font-size:11px;color:var(--texto-muted);margin-left:10px"></span>
@@ -356,7 +356,7 @@ function renderTudo(dados) {
         ${d.taxa_gratis ? '<span class="badge-ifood">GRÁTIS</span>' : ''}
       </div>
       <div class="card-cat">${d.categoria || 'Pizza'}</div>
-      <div class="card-metrics">
+      <div class="card-metrics" style="grid-template-columns:repeat(3,1fr)">
         <div class="metric-box">
           <div class="metric-label">Rating</div>
           <div class="metric-val">${d.rating ? d.rating.toFixed(1) : '—'}</div>
@@ -364,7 +364,7 @@ function renderTudo(dados) {
         <div class="metric-box">
           <div class="metric-label">Taxa</div>
           <div class="metric-val ${d.taxa_gratis ? 'gratis-val' : ''}">
-            ${d.taxa_gratis ? 'Grátis' : (d.taxa_entrega !== null ? 'R$ ' + Number(d.taxa_entrega).toFixed(2) : '—')}
+            ${d.taxa_gratis ? 'Grátis' : (d.taxa_entrega !== null && d.taxa_entrega !== undefined ? 'R$ ' + Number(d.taxa_entrega).toFixed(2) : '—')}
           </div>
         </div>
         <div class="metric-box">
@@ -372,10 +372,19 @@ function renderTudo(dados) {
           <div class="metric-val">${fmtTempo(d.tempo_min, d.tempo_max)}</div>
         </div>
         <div class="metric-box">
+          <div class="metric-label">Pizza 8 ped.</div>
+          <div class="metric-val">${d.preco_pizza_8 ? 'R$ ' + Number(d.preco_pizza_8).toFixed(2) : '—'}</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Desconto</div>
+          <div class="metric-val" style="font-size:11px;color:var(--ouro)">${d.desconto_texto || '—'}</div>
+        </div>
+        <div class="metric-box">
           <div class="metric-label">Status</div>
           <div class="metric-val ${d.aberto ? '' : 'fechado'}">${d.aberto ? '🟢 Aberto' : '🔴 Fechado'}</div>
         </div>
       </div>
+      ${d.desconto_texto ? `<div class="promo-badge">🏷️ ${d.desconto_texto}${d.desconto_valor ? ' (R$ '+Number(d.desconto_valor).toFixed(2)+' off)' : ''}</div>` : ''}
       ${d.promocao ? `<div class="promo-badge">🏷️ ${d.promocao}</div>` : ''}
       <div class="bar"><div class="bar-fill" style="width:${maxRating > 0 ? ((d.rating||0)/maxRating*100).toFixed(1) : 0}%"></div></div>
     </div>
@@ -606,22 +615,22 @@ function renderFormManual(dados) {
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
         <div>
-          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Taxa entrega (R$)</div>
-          <input class="busca-input" type="number" step="0.01" min="0"
-            id="taxa_${i}" value="${d.taxa_entrega !== null && d.taxa_entrega !== undefined ? d.taxa_entrega : ''}"
-            placeholder="0 = grátis" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
-        </div>
-        <div>
-          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Tempo entrega (min)</div>
-          <input class="busca-input" type="text"
-            id="tempo_${i}" value="${d.tempo_min && d.tempo_max ? d.tempo_min + '-' + d.tempo_max : d.tempo_min || ''}"
-            placeholder="ex: 30-45" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
-        </div>
-        <div style="grid-column:span 2">
           <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Preço pizza 8 pedaços (R$)</div>
           <input class="busca-input" type="number" step="0.01" min="0"
             id="pizza_${i}" value="${d.preco_pizza_8 || ''}"
             placeholder="ex: 89.90" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
+        </div>
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Desconto ativo (texto)</div>
+          <input class="busca-input" type="text"
+            id="desc_texto_${i}" value="${d.desconto_texto || ''}"
+            placeholder="ex: R$ 10 off, 20% off" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
+        </div>
+        <div style="grid-column:span 2">
+          <div style="font-size:9px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:3px">Valor do desconto (R$)</div>
+          <input class="busca-input" type="number" step="0.01" min="0"
+            id="desc_valor_${i}" value="${d.desconto_valor || ''}"
+            placeholder="ex: 10.00" oninput="document.getElementById('btn-salvar-manual').style.display='inline-block'">
         </div>
       </div>
     </div>
@@ -630,19 +639,16 @@ function renderFormManual(dados) {
 
 async function salvarManual() {
   const payload = _dadosManual.map((d, i) => {
-    const taxaVal = parseFloat(document.getElementById(`taxa_${i}`)?.value);
-    const tempoStr = document.getElementById(`tempo_${i}`)?.value || "";
-    const pizzaVal = parseFloat(document.getElementById(`pizza_${i}`)?.value);
-    const tempoMatch = tempoStr.match(/(\d+)[-–](\d+)/);
-    const tempoSingle = tempoStr.match(/^(\d+)$/);
+    const pizzaVal  = parseFloat(document.getElementById(`pizza_${i}`)?.value);
+    const descTexto = document.getElementById(`desc_texto_${i}`)?.value || "";
+    const descValor = parseFloat(document.getElementById(`desc_valor_${i}`)?.value);
+
     return {
-      uuid: d.uuid,
-      nome: d.nome,
-      taxa_entrega: isNaN(taxaVal) ? null : taxaVal,
-      taxa_gratis: taxaVal === 0,
-      tempo_min: tempoMatch ? parseInt(tempoMatch[1]) : (tempoSingle ? parseInt(tempoSingle[1]) : null),
-      tempo_max: tempoMatch ? parseInt(tempoMatch[2]) : (tempoSingle ? parseInt(tempoSingle[1]) : null),
-      preco_pizza_8: isNaN(pizzaVal) ? null : pizzaVal,
+      uuid:           d.uuid,
+      nome:           d.nome,
+      preco_pizza_8:  isNaN(pizzaVal) ? null : pizzaVal,
+      desconto_texto: descTexto || null,
+      desconto_valor: isNaN(descValor) ? null : descValor,
     };
   });
 

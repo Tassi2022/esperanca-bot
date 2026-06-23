@@ -517,7 +517,7 @@ function renderTudo(){
 
 async function coletarCurtidas(){
   const btn=document.getElementById("btn-coletar");
-  const pizzaria = document.getElementById("filtro-pizzaria")?.value || "esperanca_saude";
+  const pizzaria = document.getElementById("filtro-pizzaria")?.value || "esperanca";
   btn.textContent="Coletando...";btn.disabled=true;
   try{
     await fetch("/api/concorrentes/curtidas/coletar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pizzaria_id:pizzaria})});
