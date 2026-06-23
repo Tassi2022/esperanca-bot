@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
 from database import listar_oportunidades, marcar_respondida, stats, listar_datas
