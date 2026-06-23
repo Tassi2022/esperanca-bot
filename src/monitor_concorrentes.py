@@ -1,3 +1,4 @@
+import os
 import requests
 import logging
 import sqlite3
@@ -7,7 +8,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-RAPIDAPI_KEY = "e7ddbb8d15msh2d3a66faf7bcfd6p175ea8jsna0e072e97f40"
+RAPIDAPI_KEY = os.environ.get("RAPIDAPI_KEY", "")
 RAPIDAPI_HOST = "instagram-scraper-stable-api.p.rapidapi.com"
 HEADERS = {
     "x-rapidapi-host": RAPIDAPI_HOST,
@@ -510,10 +511,10 @@ def buscar_historico_mensal(username):
     return historico
 
 
-APIFY_TOKEN = "apify_api_IP6MOBXKU1FB41zfPqNnnYSobIokeH2ye8rP"
+APIFY_TOKEN = os.environ.get("APIFY_TOKEN", "")
 
 
-APIFY_TOKEN = "apify_api_IP6MOBXKU1FB41zfPqNnnYSobIokeH2ye8rP"
+APIFY_TOKEN = os.environ.get("APIFY_TOKEN", "")
 
 def buscar_posts_apify(username, limite_posts=90):
     """Busca posts via Apify Instagram Scraper. Retorna lista de posts dos ultimos 24 meses."""
