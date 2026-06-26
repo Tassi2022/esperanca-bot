@@ -25,7 +25,7 @@ DB_PATH = Path(__file__).parent.parent / "esperanca.db"
 RESTAURANTES_IFOOD = [
     {"nome": "A EsperancA",     "uuid": "0417766b-1fd7-4fc2-aa00-b9f8a1c19199", "nos": True},
     {"nome": "1900 Pizzeria",   "uuid": "b779bdec-2108-4ed4-93ad-24bb5a73c714", "nos": False},
-    {"nome": "Cezanne",         "uuid": "d14fc179-a92a-48d8-b0e0-bad9002d6e41", "nos": False},
+    {"nome": "Braz Pizzaria",    "uuid": "213beacb-bdb8-4114-a813-58ed9e9ff278", "nos": False},
     {"nome": "SalaVip",         "uuid": "8847d86f-7cec-4407-8b57-14dd12427bf6", "nos": False},
     {"nome": "Forno e Orégano", "uuid": "8d3ffb5a-337e-45b7-baec-d46897e3c381", "nos": False},
     {"nome": "Veridiana",       "uuid": "65f84e1b-90ec-4753-8cb0-a6330539cc38", "nos": False},
